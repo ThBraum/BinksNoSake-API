@@ -13,7 +13,7 @@ These instructions will help you get a copy of the project up and running on you
 - .NET Core SDK
 
 
-### Installing
+### Installing and running
 
 1. Clone the repository to your local machine.
 
