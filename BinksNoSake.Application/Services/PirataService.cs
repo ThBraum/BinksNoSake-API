@@ -23,25 +23,12 @@ public class PirataService : IPirataService
     {
         try
         {
-            var capitaoExistente = await _capitaoPersist.GetAllCapitaesByNomeAsync(model.Capitao.Nome);
-            var capitaoAssociado = capitaoExistente.FirstOrDefault();
-
-            //Se não existir um capitão com o mesmo nome e está sendo passado um capitão junto com o pirata
-            if (capitaoAssociado == null && model.Capitao != null)
-            {
-                capitaoAssociado = _mapper.Map<CapitaoModel>(model.Capitao);
-                _geralPersist.Add<CapitaoModel>(capitaoAssociado);
-            }
-
-            model.Capitao = capitaoAssociado;
-
             var pirata = _mapper.Map<PirataModel>(model);
             _geralPersist.Add<PirataModel>(pirata);
 
             if (await _geralPersist.SaveChangesAsync())
             {
-                var pirataRetorno = await _pirataPersist.GetPirataByIdAsync(pirata.PirataId);
-                return _mapper.Map<PirataDto>(pirataRetorno);
+                return _mapper.Map<PirataDto>(pirata);
             }
 
             return null;

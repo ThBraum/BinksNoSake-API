@@ -11,6 +11,7 @@ public class PirataModel
     public string Objetivo { get; set; }
 
     // Relação com Capitao
+    public int? CapitaoId { get; set; }
     public CapitaoModel Capitao { get; set; }
 
     // Relação com Navios

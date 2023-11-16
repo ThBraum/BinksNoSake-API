@@ -94,4 +94,20 @@ public class PirataController : ControllerBase
             $"Erro ao tentar atualizar pirata. Erro: {e.Message}");
         }
     }
+
+    [HttpDelete("{id}", Name = "DeletePirata")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        try
+        {
+            return await _pirataService.DeletePirata(id) ? 
+            Ok("Deletado") : 
+            BadRequest("Pirata não deletado");
+        }
+        catch (System.Exception e)
+        {
+            return this.StatusCode(StatusCodes.Status500InternalServerError, 
+            $"Erro ao tentar deletar pirata. Erro: {e.Message}");
+        }
+    }
 }

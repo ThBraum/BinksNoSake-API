@@ -17,14 +17,16 @@ namespace BinksNoSake.Domain.Models
             modelBuilder.Entity<PirataModel>()
                         .HasOne(p => p.Capitao)
                         .WithMany(c => c.Piratas)
+                        .HasForeignKey(p => p.CapitaoId)
                         .OnDelete(DeleteBehavior.SetNull);
 
             // 1:N PirataModel e NavioModel
             modelBuilder.Entity<PirataModel>()
                         .HasMany(p => p.Navios)
                         .WithOne(n => n.Pirata)
+                        .HasForeignKey(p => p.PirataId)
                         .OnDelete(DeleteBehavior.SetNull);
-
+            
             // 1:N CapitaoModel e PirataModel
             modelBuilder.Entity<CapitaoModel>()
                         .HasMany(c => c.Piratas)
@@ -42,12 +44,14 @@ namespace BinksNoSake.Domain.Models
             modelBuilder.Entity<NavioModel>()
                         .HasOne(n => n.Pirata)
                         .WithMany(p => p.Navios)
+                        .HasForeignKey(n => n.PirataId)
                         .OnDelete(DeleteBehavior.SetNull);
 
             // 1:1 TimoneiroModel e CapitaoModel
             modelBuilder.Entity<TimoneiroModel>()
                         .HasOne(t => t.Capitao)
                         .WithOne(c => c.Timoneiro)
+                        .HasForeignKey<CapitaoModel>(c => c.TimoneiroId)
                         .OnDelete(DeleteBehavior.SetNull);
         }
     }

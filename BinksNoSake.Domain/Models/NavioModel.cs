@@ -8,5 +8,6 @@ public class NavioModel
     public string Nome { get; set; }
 
     // Relação com Piratas
+    public int? PirataId { get; set; }
     public PirataModel Pirata { get; set; }
 }
