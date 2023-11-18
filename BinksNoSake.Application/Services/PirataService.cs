@@ -23,7 +23,27 @@ public class PirataService : IPirataService
     {
         try
         {
+            if (model.CapitaoId == null && model.Capitao != null)
+            {
+                var capitaoExistenteNome = await _capitaoPersist.GetCapitaoByNomeAsync(model.Capitao.Nome);
+
+                if (capitaoExistenteNome != null)
+                {
+                    model.CapitaoId = capitaoExistenteNome.Id;
+                    model.Capitao = null;
+                }
+
+            }
+
             var pirata = _mapper.Map<PirataModel>(model);
+
+            if (model.CapitaoId == null && model.Capitao != null)
+            {
+                var novoCapitao = _mapper.Map<CapitaoModel>(model.Capitao);
+                pirata.Capitao = novoCapitao;
+                _geralPersist.Add<CapitaoModel>(novoCapitao);
+            }
+
             _geralPersist.Add<PirataModel>(pirata);
 
             if (await _geralPersist.SaveChangesAsync())
@@ -38,6 +58,13 @@ public class PirataService : IPirataService
             throw new Exception(e.Message);
         }
     }
+
+
+
+
+
+
+
 
 
     public async Task<bool> DeletePirata(int pirataId)

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BinksNoSake.Persistence.Migrations
 {
     [DbContext(typeof(BinksNoSakeContext))]
-    [Migration("20231117164356_Initial")]
+    [Migration("20231118142701_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
