@@ -17,21 +17,24 @@ public class CapitaoPersist : ICapitaoPersist
         IQueryable<CapitaoModel> query = _context.Capitaes.AsNoTracking()
             .Include(c => c.Piratas)
             .Include(c => c.Timoneiro);
-        
-        query.OrderBy(p => p.CapitaoId);
 
-        return await query.ToArrayAsync();    
+        query.OrderBy(p => p.Id);
+
+        return await query.ToArrayAsync();
     }
 
-    public async Task<CapitaoModel[]> GetAllCapitaesByNomeAsync(string nome)
+    public async Task<CapitaoModel> GetCapitaoByNomeAsync(string nome)
     {
         IQueryable<CapitaoModel> query = _context.Capitaes.AsNoTracking()
             .Include(c => c.Piratas)
             .Include(c => c.Timoneiro);
-        
-        query.Where(c => c.Nome.ToLower().Contains(nome.ToLower())).OrderBy(c => c.CapitaoId);
 
-        return await query.ToArrayAsync();
+        var capitao = await query
+            .Where(c => c.Nome.ToLower().Contains(nome.ToLower()))
+            .OrderBy(c => c.Id)
+            .FirstOrDefaultAsync();
+
+        return capitao;
     }
 
     public async Task<CapitaoModel> GetCapitaoByIdAsync(int capitaoId)
@@ -39,8 +42,8 @@ public class CapitaoPersist : ICapitaoPersist
         IQueryable<CapitaoModel> query = _context.Capitaes.AsNoTracking()
             .Include(c => c.Piratas)
             .Include(c => c.Timoneiro);
-        
-        query = query.Where(c => c.CapitaoId == capitaoId).OrderBy(c => c.CapitaoId);
+
+        query = query.Where(c => c.Id == capitaoId).OrderBy(c => c.Id);
 
         return await query.FirstOrDefaultAsync();
     }

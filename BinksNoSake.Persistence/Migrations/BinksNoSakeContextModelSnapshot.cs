@@ -19,7 +19,7 @@ namespace BinksNoSake.Persistence.Migrations
 
             modelBuilder.Entity("BinksNoSake.Domain.Models.CapitaoModel", b =>
                 {
-                    b.Property<int>("CapitaoId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -29,14 +29,17 @@ namespace BinksNoSake.Persistence.Migrations
                     b.Property<int?>("TimoneiroId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("CapitaoId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("TimoneiroId")
+                        .IsUnique();
 
                     b.ToTable("Capitaes");
                 });
 
             modelBuilder.Entity("BinksNoSake.Domain.Models.NavioModel", b =>
                 {
-                    b.Property<int>("NavioId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -46,7 +49,7 @@ namespace BinksNoSake.Persistence.Migrations
                     b.Property<int?>("PirataId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("NavioId");
+                    b.HasKey("Id");
 
                     b.HasIndex("PirataId");
 
@@ -55,14 +58,14 @@ namespace BinksNoSake.Persistence.Migrations
 
             modelBuilder.Entity("BinksNoSake.Domain.Models.PirataModel", b =>
                 {
-                    b.Property<int>("PirataId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("CapitaoId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("DataIngressoTripulacao")
+                    b.Property<DateTime?>("DataIngressoTripulacao")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Funcao")
@@ -74,7 +77,7 @@ namespace BinksNoSake.Persistence.Migrations
                     b.Property<string>("Objetivo")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("PirataId");
+                    b.HasKey("Id");
 
                     b.HasIndex("CapitaoId");
 
@@ -83,7 +86,7 @@ namespace BinksNoSake.Persistence.Migrations
 
             modelBuilder.Entity("BinksNoSake.Domain.Models.TimoneiroModel", b =>
                 {
-                    b.Property<int>("TimoneiroId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -93,12 +96,19 @@ namespace BinksNoSake.Persistence.Migrations
                     b.Property<string>("Nome")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("TimoneiroId");
-
-                    b.HasIndex("CapitaoId")
-                        .IsUnique();
+                    b.HasKey("Id");
 
                     b.ToTable("Timoneiros");
+                });
+
+            modelBuilder.Entity("BinksNoSake.Domain.Models.CapitaoModel", b =>
+                {
+                    b.HasOne("BinksNoSake.Domain.Models.TimoneiroModel", "Timoneiro")
+                        .WithOne("Capitao")
+                        .HasForeignKey("BinksNoSake.Domain.Models.CapitaoModel", "TimoneiroId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Timoneiro");
                 });
 
             modelBuilder.Entity("BinksNoSake.Domain.Models.NavioModel", b =>
@@ -121,26 +131,19 @@ namespace BinksNoSake.Persistence.Migrations
                     b.Navigation("Capitao");
                 });
 
-            modelBuilder.Entity("BinksNoSake.Domain.Models.TimoneiroModel", b =>
-                {
-                    b.HasOne("BinksNoSake.Domain.Models.CapitaoModel", "Capitao")
-                        .WithOne("Timoneiro")
-                        .HasForeignKey("BinksNoSake.Domain.Models.TimoneiroModel", "CapitaoId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Capitao");
-                });
-
             modelBuilder.Entity("BinksNoSake.Domain.Models.CapitaoModel", b =>
                 {
                     b.Navigation("Piratas");
-
-                    b.Navigation("Timoneiro");
                 });
 
             modelBuilder.Entity("BinksNoSake.Domain.Models.PirataModel", b =>
                 {
                     b.Navigation("Navios");
+                });
+
+            modelBuilder.Entity("BinksNoSake.Domain.Models.TimoneiroModel", b =>
+                {
+                    b.Navigation("Capitao");
                 });
 #pragma warning restore 612, 618
         }

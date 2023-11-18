@@ -7,12 +7,12 @@ namespace BinksNoSake.Application.Dtos;
 public class TimoneiroDto
 {
     [Key]
-    public int TimoneiroId { get; set; }
+    public int Id { get; set; }
     [Display(Name = "Nome do Timoneiro")]
-    public string Nome { get; set; }
+    public string? Nome { get; set; }
 
     //Relação com Capitao
     public int? CapitaoId { get; set; }
-    [JsonIgnore]
-    public CapitaoDto Capitao { get; set; }
+    // [JsonIgnore]
+    public CapitaoDto? Capitao { get; set; }
 }

@@ -17,7 +17,7 @@ public class PirataPersist : IPirataPersist
             .Include(p => p.Capitao)
             .Include(p => p.Navios);
         
-        query.OrderBy(p => p.PirataId);
+        query.OrderBy(p => p.Id);
 
         return await query.ToArrayAsync();
     }
@@ -28,7 +28,7 @@ public class PirataPersist : IPirataPersist
             .Include(p => p.Capitao)
             .Include(p => p.Navios);
         
-        query.Where(p => p.Nome.ToLower().Contains(nome.ToLower())).OrderBy(p => p.PirataId);
+        query.Where(p => p.Nome.ToLower().Contains(nome.ToLower())).OrderBy(p => p.Id);
 
         return await query.ToArrayAsync();
     }
@@ -39,7 +39,7 @@ public class PirataPersist : IPirataPersist
             .Include(p => p.Capitao)
             .Include(p => p.Navios);
         
-        query = query.Where(p => p.PirataId == pirataId).OrderBy(p => p.PirataId);
+        query = query.Where(p => p.Id == pirataId).OrderBy(p => p.Id);
 
         return await query.FirstOrDefaultAsync();
     }

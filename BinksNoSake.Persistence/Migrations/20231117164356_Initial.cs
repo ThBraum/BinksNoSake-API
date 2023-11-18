@@ -10,59 +10,59 @@ namespace BinksNoSake.Persistence.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Timoneiros",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Nome = table.Column<string>(type: "TEXT", nullable: true),
+                    CapitaoId = table.Column<int>(type: "INTEGER", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Timoneiros", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Capitaes",
                 columns: table => new
                 {
-                    CapitaoId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Nome = table.Column<string>(type: "TEXT", nullable: true),
                     TimoneiroId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Capitaes", x => x.CapitaoId);
+                    table.PrimaryKey("PK_Capitaes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Capitaes_Timoneiros_TimoneiroId",
+                        column: x => x.TimoneiroId,
+                        principalTable: "Timoneiros",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Piratas",
                 columns: table => new
                 {
-                    PirataId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Nome = table.Column<string>(type: "TEXT", nullable: true),
                     Funcao = table.Column<string>(type: "TEXT", nullable: true),
-                    DataIngressoTripulacao = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    DataIngressoTripulacao = table.Column<DateTime>(type: "TEXT", nullable: true),
                     Objetivo = table.Column<string>(type: "TEXT", nullable: true),
                     CapitaoId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Piratas", x => x.PirataId);
+                    table.PrimaryKey("PK_Piratas", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Piratas_Capitaes_CapitaoId",
                         column: x => x.CapitaoId,
                         principalTable: "Capitaes",
-                        principalColumn: "CapitaoId",
-                        onDelete: ReferentialAction.SetNull);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Timoneiros",
-                columns: table => new
-                {
-                    TimoneiroId = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Nome = table.Column<string>(type: "TEXT", nullable: true),
-                    CapitaoId = table.Column<int>(type: "INTEGER", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Timoneiros", x => x.TimoneiroId);
-                    table.ForeignKey(
-                        name: "FK_Timoneiros_Capitaes_CapitaoId",
-                        column: x => x.CapitaoId,
-                        principalTable: "Capitaes",
-                        principalColumn: "CapitaoId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                 });
 
@@ -70,21 +70,27 @@ namespace BinksNoSake.Persistence.Migrations
                 name: "Navios",
                 columns: table => new
                 {
-                    NavioId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Nome = table.Column<string>(type: "TEXT", nullable: true),
                     PirataId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Navios", x => x.NavioId);
+                    table.PrimaryKey("PK_Navios", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Navios_Piratas_PirataId",
                         column: x => x.PirataId,
                         principalTable: "Piratas",
-                        principalColumn: "PirataId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Capitaes_TimoneiroId",
+                table: "Capitaes",
+                column: "TimoneiroId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Navios_PirataId",
@@ -95,12 +101,6 @@ namespace BinksNoSake.Persistence.Migrations
                 name: "IX_Piratas_CapitaoId",
                 table: "Piratas",
                 column: "CapitaoId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Timoneiros_CapitaoId",
-                table: "Timoneiros",
-                column: "CapitaoId",
-                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -109,13 +109,13 @@ namespace BinksNoSake.Persistence.Migrations
                 name: "Navios");
 
             migrationBuilder.DropTable(
-                name: "Timoneiros");
-
-            migrationBuilder.DropTable(
                 name: "Piratas");
 
             migrationBuilder.DropTable(
                 name: "Capitaes");
+
+            migrationBuilder.DropTable(
+                name: "Timoneiros");
         }
     }
 }

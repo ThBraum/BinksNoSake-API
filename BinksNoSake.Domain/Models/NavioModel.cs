@@ -4,10 +4,10 @@ namespace BinksNoSake.Domain.Models;
 public class NavioModel
 {
     [Key]
-    public int NavioId { get; set; }
-    public string Nome { get; set; }
+    public int Id { get; set; }
+    public string? Nome { get; set; }
 
     // Relação com Piratas
     public int? PirataId { get; set; }
-    public PirataModel Pirata { get; set; }
+    public PirataModel? Pirata { get; set; }
 }

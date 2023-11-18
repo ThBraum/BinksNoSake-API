@@ -104,12 +104,12 @@ public class PirataService : IPirataService
         {
             var pirata = await _pirataPersist.GetPirataByIdAsync(pirataId);
             if (pirata == null) throw new Exception("Pirata não encontrado.");
-            model.PirataId = pirata.PirataId;
+            model.Id = pirata.Id;
             _mapper.Map(model, pirata); //atualizando o pirata com os dados do model, mapeia o model para o pirata
             _geralPersist.Update<PirataModel>(pirata);
             if (await _geralPersist.SaveChangesAsync())
             {
-                var pirataRetorno = await _pirataPersist.GetPirataByIdAsync(pirata.PirataId);
+                var pirataRetorno = await _pirataPersist.GetPirataByIdAsync(pirata.Id);
                 return _mapper.Map<PirataDto>(pirataRetorno); //mapeando para o tipo de retorno
             }
             return null;

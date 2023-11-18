@@ -9,5 +9,5 @@ public interface ICapitaoService
     Task<CapitaoDto> UpdateCapitao(int capitaoId, CapitaoDto model);
     Task<bool> DeleteCapitao(int capitaoId);
     Task<CapitaoDto[]> GetAllCapitaesAsync();
-    Task<CapitaoDto[]> GetAllCapitaesByNomeAsync(string nome);
+    Task<CapitaoDto> GetCapitaoByNomeAsync(string nome);
 }

@@ -4,6 +4,7 @@ using BinksNoSake.Application.Contratos;
 using BinksNoSake.Application.Services;
 using BinksNoSake.Persistence.Contratos;
 using BinksNoSake.Persistence.Persistence;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,7 +34,10 @@ builder.Services.AddDbContext<BinksNoSakeContext>(context =>
     context.UseSqlite(builder.Configuration.GetConnectionString("Default"));  //("Data Source=Data\\BinksNoSake.db");
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve; //Evita o erro de referência circular
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

@@ -20,30 +20,31 @@ public class CapitaoService : ICapitaoService
 
     public async Task<CapitaoDto> AddCapitao(CapitaoDto model)
     {
-        try
-        {
-            var capitaoExistente = await _capitaoPersist.GetAllCapitaesByNomeAsync(model.Nome);
-            foreach (var cap in capitaoExistente)
-            {
-                if (model.Nome == cap.Nome)
-                {
-                    throw new Exception("Capitão já cadastrado.");
-                }
-            }
-            var capitao = _mapper.Map<CapitaoModel>(model);
-            _geralPersist.Add<CapitaoModel>(capitao);
-            if (await _geralPersist.SaveChangesAsync())
-            {
-                var capitaoRetorno = await _capitaoPersist.GetCapitaoByIdAsync(capitao.CapitaoId);
-                return _mapper.Map<CapitaoDto>(capitaoRetorno);
-            }
-            return null;
-        }
-        catch (System.Exception e)
-        {
+        throw new NotImplementedException();
+        // try
+        // {
+        //     var capitaoExistente = await _capitaoPersist.GetCapitaoByNomeAsync(model.Nome);
+        //     foreach (var cap in capitaoExistente)
+        //     {
+        //         if (model.Nome == cap.Nome)
+        //         {
+        //             throw new Exception("Capitão já cadastrado.");
+        //         }
+        //     }
+        //     var capitao = _mapper.Map<CapitaoModel>(model);
+        //     _geralPersist.Add<CapitaoModel>(capitao);
+        //     if (await _geralPersist.SaveChangesAsync())
+        //     {
+        //         var capitaoRetorno = await _capitaoPersist.GetCapitaoByIdAsync(capitao.Id);
+        //         return _mapper.Map<CapitaoDto>(capitaoRetorno);
+        //     }
+        //     return null;
+        // }
+        // catch (System.Exception e)
+        // {
 
-            throw new Exception(e.Message);
-        }
+        //     throw new Exception(e.Message);
+        // }
     }
 
     public async Task<bool> DeleteCapitao(int capitaoId)
@@ -79,20 +80,21 @@ public class CapitaoService : ICapitaoService
         }
     }
 
-    public async Task<CapitaoDto[]> GetAllCapitaesByNomeAsync(string nome)
+    public async Task<CapitaoDto> GetCapitaoByNomeAsync(string nome)
     {
-        try
-        {
-            var capitao = await _capitaoPersist.GetAllCapitaesByNomeAsync(nome);
-            if (capitao == null) return null;
-            var resultado = _mapper.Map<CapitaoDto[]>(capitao);
-            return resultado;
-        }
-        catch (System.Exception e)
-        {
+        throw new NotImplementedException();
+        // try
+        // {
+        //     var capitao = await _capitaoPersist.GetAllCapitaesByNomeAsync(nome);
+        //     if (capitao == null) return null;
+        //     var resultado = _mapper.Map<CapitaoDto[]>(capitao);
+        //     return resultado;
+        // }
+        // catch (System.Exception e)
+        // {
 
-            throw new Exception(e.Message);
-        }
+        //     throw new Exception(e.Message);
+        // }
     }
 
     public async Task<CapitaoDto> GetCapitaoByIdAsync(int capitaoId)
@@ -117,12 +119,12 @@ public class CapitaoService : ICapitaoService
         {
             var capitao = await _capitaoPersist.GetCapitaoByIdAsync(capitaoId);
             if (capitao == null) throw new Exception("Capitão não encontrado.");
-            model.CapitaoId = capitao.CapitaoId;
+            model.Id = capitao.Id;
             _mapper.Map(model, capitao);
             _geralPersist.Update<CapitaoModel>(capitao);
             if (await _geralPersist.SaveChangesAsync())
             {
-                var capitaoRetorno = await _capitaoPersist.GetCapitaoByIdAsync(capitao.CapitaoId);
+                var capitaoRetorno = await _capitaoPersist.GetCapitaoByIdAsync(capitao.Id);
                 return _mapper.Map<CapitaoDto>(capitaoRetorno);
             }
             return null;
