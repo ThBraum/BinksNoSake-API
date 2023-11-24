@@ -3,8 +3,9 @@
 ![luffy](https://github.com/ThBraum/Images-for-GitHub/assets/85642694/bd78e977-cf92-4396-90d0-f7769c65b62c)
 
 ***
-![Binks No Sake drawio](https://github.com/ThBraum/BinksNoSake/assets/85642694/8b2cba22-e807-4602-999c-370fae5ff8b1)
-
+<p align="center">
+  <img src="[https://github.com/waldyr/Sublime-Installer/blob/master/sublime_text.png?raw=true](https://github.com/ThBraum/BinksNoSake/assets/85642694/8b2cba22-e807-4602-999c-370fae5ff8b1)"/>
+</p>
 
 ## Getting Started
 
