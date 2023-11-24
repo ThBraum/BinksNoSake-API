@@ -4,7 +4,7 @@
 
 ***
 <p align="center">
-  <img src="[https://github.com/waldyr/Sublime-Installer/blob/master/sublime_text.png?raw=true](https://github.com/ThBraum/BinksNoSake/assets/85642694/8b2cba22-e807-4602-999c-370fae5ff8b1)"/>
+  <img src="![Binks No Sake drawio](https://github.com/ThBraum/BinksNoSake/assets/85642694/8985fa35-e01e-40dd-a002-9d6aac9dcb4a)"/>
 </p>
 
 ## Getting Started
