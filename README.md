@@ -4,7 +4,7 @@
 
 ***
 <p align="center">
-  <img src="![Binks No Sake drawio](https://github.com/ThBraum/BinksNoSake/assets/85642694/8985fa35-e01e-40dd-a002-9d6aac9dcb4a)"/>
+  <img src="https://github.com/ThBraum/BinksNoSake/assets/85642694/8985fa35-e01e-40dd-a002-9d6aac9dcb4a"/>
 </p>
 
 ## Getting Started
