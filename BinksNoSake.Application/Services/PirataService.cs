@@ -25,24 +25,36 @@ public class PirataService : IPirataService
         {
             if (model.CapitaoId == null && model.Capitao != null)
             {
-                var capitaoExistenteNome = await _capitaoPersist.GetCapitaoByNomeAsync(model.Capitao.Nome);
-
-                if (capitaoExistenteNome != null)
+                if (model.Capitao.Id > 0)
                 {
-                    model.CapitaoId = capitaoExistenteNome.Id;
+                    var capitaoExistenteId = await _capitaoPersist.GetCapitaoByIdAsync(model.Capitao.Id);
+                    if (capitaoExistenteId != null)
+                    {
+                        model.CapitaoId = capitaoExistenteId.Id;
+                        model.Capitao = null;
+                    }
+                } 
+                else if (model.Capitao.Nome != null) 
+                {
+                    var capitaoExistenteNome = await _capitaoPersist.GetCapitaoByNomeAsync(model.Capitao.Nome);
+                    if (capitaoExistenteNome != null)
+                    {
+                        model.CapitaoId = capitaoExistenteNome.Id;
+                        model.Capitao = null;
+                    }
+                }
+            }
+            else if (model.CapitaoId != null)
+            {
+                var capitaoExistenteId = await _capitaoPersist.GetCapitaoByIdAsync((int)model.CapitaoId);
+                if (capitaoExistenteId != null)
+                {
+                    model.CapitaoId = capitaoExistenteId.Id;
                     model.Capitao = null;
                 }
-
             }
 
             var pirata = _mapper.Map<PirataModel>(model);
-
-            if (model.CapitaoId == null && model.Capitao != null)
-            {
-                var novoCapitao = _mapper.Map<CapitaoModel>(model.Capitao);
-                pirata.Capitao = novoCapitao;
-                _geralPersist.Add<CapitaoModel>(novoCapitao);
-            }
 
             _geralPersist.Add<PirataModel>(pirata);
 
@@ -58,13 +70,6 @@ public class PirataService : IPirataService
             throw new Exception(e.Message);
         }
     }
-
-
-
-
-
-
-
 
 
     public async Task<bool> DeletePirata(int pirataId)
