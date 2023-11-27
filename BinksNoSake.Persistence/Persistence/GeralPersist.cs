@@ -1,5 +1,6 @@
 using BinksNoSake.Domain.Models;
 using BinksNoSake.Persistence.Contratos;
+using Microsoft.EntityFrameworkCore;
 
 namespace BinksNoSake.Persistence.Persistence;
 public class GeralPersist : IGeralPersist
@@ -31,6 +32,11 @@ public class GeralPersist : IGeralPersist
         _context.Update(entity);
     }
 
+    public async void Detach<T>(T entity) where T : class
+    {
+        _context.Entry(entity).State = EntityState.Detached;
+    }
+
     public async Task<bool> SaveChangesAsync()
     {
         try
@@ -47,6 +53,4 @@ public class GeralPersist : IGeralPersist
             throw new Exception (e.Message); 
         }
     }
-
-
 }

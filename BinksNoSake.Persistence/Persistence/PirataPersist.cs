@@ -11,6 +11,23 @@ public class PirataPersist : IPirataPersist
         _context = context;
     }
 
+    public async Task<PirataModel> AddPirataWithExistingCapitaoAsync(PirataModel pirata, CapitaoModel capitao)
+    {
+        var capitaoExistente = await _context.Capitaes.FindAsync(capitao.Id);
+        if (capitaoExistente != null)
+        {
+            pirata.Capitao = capitaoExistente;
+        }
+        else
+        {
+            pirata.Capitao = capitao;
+        }
+
+        _context.Piratas.Add(pirata);
+
+        return pirata;
+    }
+
     public async Task<PirataModel[]> GetAllPiratasAsync()
     {
         IQueryable<PirataModel> query = _context.Piratas.AsNoTracking()
