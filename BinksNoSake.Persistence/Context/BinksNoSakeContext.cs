@@ -1,8 +1,13 @@
+using BinksNoSake.Domain.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace BinksNoSake.Domain.Models
 {
-    public class BinksNoSakeContext : DbContext
+    public class BinksNoSakeContext : IdentityDbContext<Account, Role, int, 
+                                                    IdentityUserClaim<int>, AccountRole, IdentityUserLogin<int>, 
+                                                    IdentityRoleClaim<int>, IdentityUserToken<int>>
     {
         public BinksNoSakeContext(DbContextOptions<BinksNoSakeContext> options) : base(options) { }
 
@@ -13,6 +18,15 @@ namespace BinksNoSake.Domain.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<AccountRole>(accountRole =>
+            {
+                accountRole.HasKey(ar => new { ar.UserId, ar.RoleId });
+                accountRole.HasOne(ar => ar.Account).WithMany(a => a.AccountRoles).HasForeignKey(ar => ar.UserId).IsRequired();
+                accountRole.HasOne(ar => ar.Role).WithMany(r => r.AccountRole).HasForeignKey(ar => ar.RoleId).IsRequired();
+            });
+
             // N:1 PirataModel e CapitaoModel
             modelBuilder.Entity<PirataModel>()
                         .HasOne(p => p.Capitao)
