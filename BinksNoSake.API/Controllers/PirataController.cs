@@ -1,5 +1,6 @@
 using BinksNoSake.Application.Contratos;
 using BinksNoSake.Application.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BinksNoSake.API.Controllers;
@@ -16,6 +17,7 @@ public class PirataController : ControllerBase
     }
 
     [HttpGet(Name = "GetAllPiratas")]
+    [AllowAnonymous]
     public async Task<IActionResult> Get()
     {
         try
@@ -32,6 +34,7 @@ public class PirataController : ControllerBase
     }
 
     [HttpGet("{id}", Name = "GetPirataById")]
+    [AllowAnonymous]
     public async Task<IActionResult> Get(int id)
     {
         try
@@ -48,6 +51,7 @@ public class PirataController : ControllerBase
     }
 
     [HttpGet("nome/{nome}", Name = "GetPirataByNome")]
+    [AllowAnonymous]
     public async Task<IActionResult> Get(string nome)
     {
         try

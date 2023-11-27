@@ -1,5 +1,6 @@
 using BinksNoSake.Application.Contratos;
 using BinksNoSake.Application.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BinksNoSake.API.Controllers;
@@ -17,6 +18,7 @@ public class CapitaoController : ControllerBase
     }
 
     [HttpGet(Name = "GetAllCapitaes")]
+    [AllowAnonymous]
     public async Task<IActionResult> Get()
     {
         try
@@ -32,6 +34,7 @@ public class CapitaoController : ControllerBase
     }
 
     [HttpGet("{id}", Name = "GetCapitaoById")]
+    [AllowAnonymous]
     public async Task<IActionResult> Get(int id)
     {
         try
@@ -48,6 +51,7 @@ public class CapitaoController : ControllerBase
     }
 
     [HttpGet("nome/{nome}", Name = "GetCapitaoByNome")]
+    [AllowAnonymous]
     public async Task<IActionResult> Get(string nome)
     {
         try
@@ -56,10 +60,10 @@ public class CapitaoController : ControllerBase
             if (capitaes == null) return NoContent();
             return Ok(capitaes);
         }
-        catch (System.Exception)
+        catch (System.Exception e)
         {
 
-            throw;
+            throw new Exception(e.Message);
         }
     }
 

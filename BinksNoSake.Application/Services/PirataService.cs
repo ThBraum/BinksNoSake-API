@@ -23,40 +23,25 @@ public class PirataService : IPirataService
     {
         try
         {
-            if (model.CapitaoId == null && model.Capitao != null)
+            if (model.Capitao != null)
             {
-                if (model.Capitao.Id > 0)
-                {
-                    var capitaoExistenteId = await _capitaoPersist.GetCapitaoByIdAsync(model.Capitao.Id);
-                    if (capitaoExistenteId != null)
-                    {
-                        model.CapitaoId = capitaoExistenteId.Id;
-                        model.Capitao = null;
-                    }
-                } 
-                else if (model.Capitao.Nome != null) 
-                {
-                    var capitaoExistenteNome = await _capitaoPersist.GetCapitaoByNomeAsync(model.Capitao.Nome);
-                    if (capitaoExistenteNome != null)
-                    {
-                        model.CapitaoId = capitaoExistenteNome.Id;
-                        model.Capitao = null;
-                    }
-                }
+                model.Capitao = await GetCapitaoByIdOrNome(model.Capitao);
             }
-            else if (model.CapitaoId != null)
+            if (model.CapitaoId != null)
             {
-                var capitaoExistenteId = await _capitaoPersist.GetCapitaoByIdAsync((int)model.CapitaoId);
-                if (capitaoExistenteId != null)
-                {
-                    model.CapitaoId = capitaoExistenteId.Id;
-                    model.Capitao = null;
-                }
+                model.Capitao = await GetCapitaoId(model, model.Capitao);
             }
 
             var pirata = _mapper.Map<PirataModel>(model);
-
-            _geralPersist.Add<PirataModel>(pirata);
+            
+            if (model.Capitao != null)
+            {
+                await _pirataPersist.AddPirataWithExistingCapitaoAsync(pirata, pirata.Capitao);
+            }
+            else
+            {
+                _geralPersist.Add<PirataModel>(pirata);
+            }
 
             if (await _geralPersist.SaveChangesAsync())
             {
@@ -70,7 +55,6 @@ public class PirataService : IPirataService
             throw new Exception(e.Message);
         }
     }
-
 
     public async Task<bool> DeletePirata(int pirataId)
     {
@@ -152,4 +136,39 @@ public class PirataService : IPirataService
             throw new Exception(e.Message);
         }
     }
+    private async Task<CapitaoDto> GetCapitaoByIdOrNome(CapitaoDto capitao)
+    {
+        if (capitao.Id > 0)
+        {
+            var capitaoExistenteId = await _capitaoPersist.GetCapitaoByIdAsync(capitao.Id);
+            if (capitaoExistenteId != null)
+            {
+                _geralPersist.Detach<CapitaoModel>(capitaoExistenteId); //desacoplando o capitaoExistenteId
+                return _mapper.Map<CapitaoDto>(capitaoExistenteId);
+            }
+        }
+        else if (capitao.Nome != null)
+        {
+            var capitaoExistenteNome = await _capitaoPersist.GetCapitaoByNomeAsync(capitao.Nome);
+            if (capitaoExistenteNome != null)
+            {
+                _geralPersist.Detach<CapitaoModel>(capitaoExistenteNome); //desacoplando o capitaoExistenteNome
+                return _mapper.Map<CapitaoDto>(capitaoExistenteNome);
+            }
+        }
+        return capitao;
+    }
+
+    private async Task<CapitaoDto> GetCapitaoId(PirataDto pirataDto, CapitaoDto capitao)
+    {
+        var capitaoIdExistente = await _capitaoPersist.GetCapitaoByIdAsync(pirataDto.CapitaoId.Value);
+        if (capitaoIdExistente != null)
+        {
+            _geralPersist.Detach<CapitaoModel>(capitaoIdExistente); //desacoplando o capitaoIdExistente
+            return _mapper.Map<CapitaoDto>(capitaoIdExistente);
+        }
+        return capitao;
+    }
+
+
 }
