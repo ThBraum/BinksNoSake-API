@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BinksNoSake.API.Controllers;
+[ApiController]
+[Route("[controller]")]
 public class AccountController : ControllerBase
 {
     private readonly IAccountService _accountService;
