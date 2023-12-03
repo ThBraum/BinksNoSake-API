@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BinksNoSake.Persistence.Migrations
 {
     [DbContext(typeof(BinksNoSakeContext))]
-    [Migration("20231127202331_Initial")]
+    [Migration("20231203191848_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -192,6 +192,9 @@ namespace BinksNoSake.Persistence.Migrations
                     b.Property<string>("Funcao")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ImagemURL")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Nome")
                         .HasColumnType("TEXT");
 
@@ -203,6 +206,26 @@ namespace BinksNoSake.Persistence.Migrations
                     b.HasIndex("CapitaoId");
 
                     b.ToTable("Piratas");
+                });
+
+            modelBuilder.Entity("BinksNoSake.Domain.Models.RefreshTokens", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Token")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Username")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("BinksNoSake.Domain.Models.TimoneiroModel", b =>

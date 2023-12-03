@@ -68,6 +68,7 @@ public class CapitaoController : ControllerBase
     }
 
     [HttpPost(Name = "AddCapitao")]
+    [Authorize]
     public async Task<IActionResult> Post(CapitaoDto model)
     {
         try
@@ -84,6 +85,7 @@ public class CapitaoController : ControllerBase
     }
 
     [HttpPut("{id}", Name = "UpdateCapitao")]
+    [Authorize]
     public async Task<IActionResult> Put(int id, CapitaoDto model)
     {
         try
@@ -100,6 +102,7 @@ public class CapitaoController : ControllerBase
     }
 
     [HttpDelete("{id}", Name = "DeleteCapitao")]
+    [Authorize]
     public async Task<IActionResult> Delete(int id)
     {
         try

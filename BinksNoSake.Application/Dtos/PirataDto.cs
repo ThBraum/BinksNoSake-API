@@ -11,6 +11,7 @@ public class PirataDto
     public string? Funcao { get; set; }
     public DateTime? DataIngressoTripulacao { get; set; }
     public string? Objetivo { get; set; }
+    public string? ImagemURL { get; set; }
 
     // Relação com Capitao
     public int? CapitaoId { get; set; }

@@ -55,6 +55,21 @@ namespace BinksNoSake.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RefreshTokens",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Username = table.Column<string>(type: "TEXT", nullable: true),
+                    Token = table.Column<string>(type: "TEXT", nullable: true),
+                    RefreshToken = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Timoneiros",
                 columns: table => new
                 {
@@ -204,6 +219,7 @@ namespace BinksNoSake.Persistence.Migrations
                     Funcao = table.Column<string>(type: "TEXT", nullable: true),
                     DataIngressoTripulacao = table.Column<DateTime>(type: "TEXT", nullable: true),
                     Objetivo = table.Column<string>(type: "TEXT", nullable: true),
+                    ImagemURL = table.Column<string>(type: "TEXT", nullable: true),
                     CapitaoId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
@@ -310,6 +326,9 @@ namespace BinksNoSake.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "Navios");
+
+            migrationBuilder.DropTable(
+                name: "RefreshTokens");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

@@ -15,6 +15,7 @@ namespace BinksNoSake.Domain.Models
         public DbSet<CapitaoModel> Capitaes { get; set; }
         public DbSet<NavioModel> Navios { get; set; }
         public DbSet<TimoneiroModel> Timoneiros { get; set; }
+        public DbSet<RefreshTokens> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

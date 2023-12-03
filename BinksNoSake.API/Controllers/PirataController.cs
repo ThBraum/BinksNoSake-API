@@ -68,6 +68,7 @@ public class PirataController : ControllerBase
     }
 
     [HttpPost(Name = "AddPirata")]
+    [Authorize]
     public async Task<IActionResult> Post(PirataDto model)
     {
         try
@@ -84,6 +85,7 @@ public class PirataController : ControllerBase
     }
 
     [HttpPut("{id}", Name = "UpdatePirata")]
+    [Authorize]
     public async Task<IActionResult> Put(int id, PirataDto model)
     {
         try
@@ -100,6 +102,7 @@ public class PirataController : ControllerBase
     }
 
     [HttpDelete("{id}", Name = "DeletePirata")]
+    [Authorize]
     public async Task<IActionResult> Delete(int id)
     {
         try

@@ -3,6 +3,8 @@ using BinksNoSake.Application.Contratos;
 using BinksNoSake.Application.Dtos;
 using BinksNoSake.Domain.Identity;
 using BinksNoSake.Persistence.Contratos;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 
 namespace BinksNoSake.Application.Services;
@@ -12,9 +14,11 @@ public class AccountService : IAccountService
     private readonly SignInManager<Account> _signInManager;
     private readonly IAccountPersist _accountPersist;
     private readonly IMapper _mapper;
+    private readonly IWebHostEnvironment _hostEnvironment;
 
-    public AccountService(UserManager<Account> userManager, SignInManager<Account> signInManager, IMapper mapper, IAccountPersist accountPersist)
+    public AccountService(UserManager<Account> userManager, SignInManager<Account> signInManager, IMapper mapper, IAccountPersist accountPersist, IWebHostEnvironment hostEnvironment)
     {
+        _hostEnvironment = hostEnvironment;
         _accountPersist = accountPersist;
         _signInManager = signInManager;
         _userManager = userManager;
@@ -57,6 +61,12 @@ public class AccountService : IAccountService
         }
     }
 
+    public void DeleteImage(int userId, string imageName)
+    {
+        var imagePath = Path.Combine(_hostEnvironment.ContentRootPath, @"Resources/Images", imageName);
+        if (System.IO.File.Exists(imagePath)) System.IO.File.Delete(imagePath);
+    }
+
     public async Task<AccountUpdateDto> GetUserByUsernameAsync(string username)
     {
         try
@@ -70,6 +80,21 @@ public class AccountService : IAccountService
 
             throw new Exception($"Erro ao obter usuário. {e.Message}");
         }
+    }
+
+    public async Task<string> SaveImage(IFormFile image)
+    {
+        string imageName = new String(Path.GetFileNameWithoutExtension(image.FileName)
+                                        .Take(10).ToArray()).Replace(' ', '-');
+        imageName = $"{imageName}{DateTime.UtcNow.ToString("yymmssfff")}{Path.GetExtension(image.FileName)}";
+
+        var imagePath = Path.Combine(_hostEnvironment.ContentRootPath, @"Resources/Images", imageName);
+        using (var fileStream = new FileStream(imagePath, FileMode.Create))
+        {
+            await image.CopyToAsync(fileStream);
+        }
+
+        return imageName;
     }
 
     public async Task<AccountUpdateDto> UpdateAccount(AccountUpdateDto accountUpdateDto)

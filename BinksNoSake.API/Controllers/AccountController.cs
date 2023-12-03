@@ -17,6 +17,23 @@ public class AccountController : ControllerBase
         _accountService = accountService;
     }
 
+    [HttpGet("GetUser", Name = "GetUser")]
+    [Authorize]
+    public async Task<IActionResult> GetUser()
+    {
+        try
+        {
+            var username = User.GetUserName();
+            var user = await _accountService.GetUserByUsernameAsync(username);
+            user.RefreshToken = await _tokenService.GetRefreshToken(user.Username);
+            return Ok(user);
+        }
+        catch (System.Exception e)
+        {
+            return this.StatusCode(StatusCodes.Status500InternalServerError, $"Erro {e.Message}");
+        }
+    }
+
 
     [HttpPost("register")]
     [AllowAnonymous]
@@ -41,35 +58,8 @@ public class AccountController : ControllerBase
         }
     }
 
-    [HttpPost("login")]
-    [AllowAnonymous]
-    public async Task<IActionResult> Login([FromBody] AccountLoginDto accountLoginDto)
-    {
-        try
-        {
-            var user = await _accountService.GetUserByUsernameAsync(accountLoginDto.Username);
-            if (user == null) return Unauthorized("Usuário não cadastrado!");
-
-            var result = await _accountService.CheckUserPasswordAsync(user, accountLoginDto.Password);
-            if (result.Succeeded)
-            {
-                return Ok(new
-                {
-                    username = user.Username,
-                    primeiroNome = user.Username,
-                    token = await _tokenService.CreateToken(user)
-                });
-            }
-            return Unauthorized("Usuário ou senha incorretos!");
-        }
-        catch (System.Exception e)
-        {
-
-            throw new Exception($"Erro ao tentar logar! {e.Message}");
-        }
-    }
-
     [HttpPut("update")]
+    [Authorize]
     public async Task<IActionResult> UpdateUser([FromBody] AccountUpdateDto accountUpdateDto)
     {
         try
@@ -78,6 +68,11 @@ public class AccountController : ControllerBase
 
             var user = await _accountService.GetUserByUsernameAsync(User.GetUserName());
             if (user == null) return Unauthorized("Usuário Inválido");
+
+            if (accountUpdateDto.ImagemURL != null)
+            {
+                await uploadAccountImage(accountUpdateDto.ImagemURL);
+            }
 
             var userReturn = await _accountService.UpdateAccount(accountUpdateDto);
             if (userReturn == null) return NoContent();
@@ -90,18 +85,49 @@ public class AccountController : ControllerBase
         }
     }
 
-    [HttpGet("GetUser", Name = "GetUser")]
-    public async Task<IActionResult> GetUser()
+    // [HttpPost("upload-image", Name = "UploadImage")]
+    // public async Task<IActionResult> UploadImage()
+    // {
+    //     try
+    //     {
+    //         var user = await _accountService.GetUserByUsernameAsync(User.GetUserName());
+    //         if (user == null) return NoContent();
+
+    //         var file = Request.Form.Files[0];
+    //         if (file.Length > 0)
+    //         {
+    //             _accountService.DeleteImage(User.GetUserId(), user.ImagemURL);
+    //             user.ImagemURL = await _accountService.SaveImage(file);
+    //         }
+
+    //         var eventoRetorno = await _accountService.UpdateAccount(user);
+    //         if (eventoRetorno == null) return BadRequest("Erro ao tentar atualizar evento");
+    //         return Ok(eventoRetorno);
+    //     }
+    //     catch (System.Exception e)
+    //     {
+    //         return this.StatusCode(StatusCodes.Status500InternalServerError, 
+    //             $"Erro ao realizar upload de imagem. Erro: {e.Message}");
+    //     }
+    // }
+
+
+    [NonAction]
+    public async Task<string> uploadAccountImage(string imageName)
     {
         try
         {
-            var username = User.GetUserName();
-            var user = await _accountService.GetUserByUsernameAsync(username);
-            return Ok(user);
+            var file = Request.Form.Files[0];
+            if (file.Length > 0)
+            {
+                _accountService.DeleteImage(User.GetUserId(), imageName);
+                imageName = await _accountService.SaveImage(file);
+            }
+            return imageName;
         }
         catch (System.Exception e)
         {
-            throw new Exception($"Erro ao tentar obter usuário! {e.Message}");
+            throw new Exception(e.Message);
         }
     }
 }
