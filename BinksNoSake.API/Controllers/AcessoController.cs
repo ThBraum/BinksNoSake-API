@@ -50,19 +50,19 @@ public class AcessoController : ControllerBase
 
     [HttpPost("refreshToken")]
     [AllowAnonymous]
-    public async Task<IActionResult> RefreshToken(string token, string refreshToken)
+    public async Task<IActionResult> RefreshToken()
     {
         try
         {
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             var principal = _tokenService.GetPrincipalFromExpiredToken(token);
             var username = principal.Identity.Name;
             var savedRefreshToken = await _tokenService.GetRefreshToken(username);
-            if (savedRefreshToken != refreshToken) return BadRequest("Refresh Token inválido!");
 
             var newJwtToken = await _tokenService.CreateTokenEnumerator(principal.Claims);
             var newRefreshToken = await _tokenService.GenereteRefreshToken();
 
-            _tokenService.DeleteRefreshToken(username, refreshToken);
+            _tokenService.DeleteRefreshToken(username, savedRefreshToken);
             _tokenService.SaveRefreshToken(username, newRefreshToken);
             return Ok(new
             {
@@ -72,8 +72,7 @@ public class AcessoController : ControllerBase
         }
         catch (System.Exception e)
         {
-
-            throw new Exception($"Erro ao tentar logar! {e.Message}");
+            return this.StatusCode(StatusCodes.Status401Unauthorized, $"Erro {e.Message}");
         }
     }
 }

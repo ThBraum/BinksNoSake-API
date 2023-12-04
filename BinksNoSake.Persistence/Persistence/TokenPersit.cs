@@ -13,8 +13,11 @@ public class TokenPersit : ITokenPersit
     
     public void DeleteRefreshToken(string username, string refreshToken)
     {
-        var item = _context.RefreshTokens.FirstOrDefault(x => x.Username == username && x.RefreshToken == refreshToken);
-        _context.RefreshTokens.Remove(item);
+        IQueryable<RefreshTokens> query = _context.RefreshTokens.AsNoTracking();
+
+        query = query.Where(r => r.Username == username && r.RefreshToken == refreshToken);
+
+        _context.RefreshTokens.Remove(query.FirstOrDefault());
     }
 
     public async Task<string> GetRefreshToken(string username)
