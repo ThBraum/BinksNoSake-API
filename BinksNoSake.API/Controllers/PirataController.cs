@@ -1,7 +1,10 @@
+using BinksNoSake.API.Extensions;
 using BinksNoSake.Application.Contratos;
 using BinksNoSake.Application.Dtos;
+using BinksNoSake.Persistence.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 
 namespace BinksNoSake.API.Controllers;
 
@@ -18,12 +21,15 @@ public class PirataController : ControllerBase
 
     [HttpGet(Name = "GetAllPiratas")]
     [AllowAnonymous]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> Get([FromQuery] PageParams pageParams)
     {
         try
         {
-            var piratas = await _pirataService.GetAllPiratasAsync();
+            var piratas = await _pirataService.GetAllPiratasAsync(pageParams);
             if (piratas == null) return NoContent();
+
+            Response.AddPagination(piratas.CurrentPage, piratas.PageSize, piratas.TotalCount, piratas.TotalPages);
+
             return Ok(piratas);
         }
         catch (System.Exception e)
@@ -50,22 +56,6 @@ public class PirataController : ControllerBase
         }
     }
 
-    [HttpGet("nome/{nome}", Name = "GetPirataByNome")]
-    [AllowAnonymous]
-    public async Task<IActionResult> Get(string nome)
-    {
-        try
-        {
-            var piratas = await _pirataService.GetAllPiratasByNomeAsync(nome);
-            if (piratas == null) return NoContent();
-            return Ok(piratas);
-        }
-        catch (System.Exception e)
-        {
-            return this.StatusCode(StatusCodes.Status500InternalServerError, 
-            $"Erro ao tentar recuperar piratas. Erro: {e.Message}");
-        }
-    }
 
     [HttpPost(Name = "AddPirata")]
     [Authorize]

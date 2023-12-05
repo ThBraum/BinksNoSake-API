@@ -1,5 +1,6 @@
 using BinksNoSake.Domain.Models;
 using BinksNoSake.Persistence.Contratos;
+using BinksNoSake.Persistence.Pagination;
 using Microsoft.EntityFrameworkCore;
 
 namespace BinksNoSake.Persistence.Persistence;
@@ -28,27 +29,17 @@ public class PirataPersist : IPirataPersist
         return pirata;
     }
 
-    public async Task<PirataModel[]> GetAllPiratasAsync()
+    public async Task<PageList<PirataModel>> GetAllPiratasAsync(PageParams pageParams)
     {
         IQueryable<PirataModel> query = _context.Piratas.AsNoTracking()
             .Include(p => p.Capitao)
             .Include(p => p.Navios);
         
-        query.OrderBy(p => p.Id);
+        query.Where(p => p.Nome.ToLower().Contains(pageParams.Term.ToLower())).OrderBy(p => p.Id);
 
-        return await query.ToArrayAsync();
+        return await PageList<PirataModel>.CreateAsync(query, pageParams.PageNumber, pageParams.PageSize);
     }
 
-    public async Task<PirataModel[]> GetAllPiratasByNomeAsync(string nome)
-    {
-        IQueryable<PirataModel> query = _context.Piratas.AsNoTracking()
-            .Include(p => p.Capitao)
-            .Include(p => p.Navios);
-        
-        query.Where(p => p.Nome.ToLower().Contains(nome.ToLower())).OrderBy(p => p.Id);
-
-        return await query.ToArrayAsync();
-    }
 
     public async Task<PirataModel> GetPirataByIdAsync(int pirataId)
     {

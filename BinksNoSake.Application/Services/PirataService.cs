@@ -3,6 +3,7 @@ using BinksNoSake.Application.Contratos;
 using BinksNoSake.Application.Dtos;
 using BinksNoSake.Domain.Models;
 using BinksNoSake.Persistence.Contratos;
+using BinksNoSake.Persistence.Pagination;
 
 namespace BinksNoSake.Application.Services;
 public class PirataService : IPirataService
@@ -33,7 +34,7 @@ public class PirataService : IPirataService
             }
 
             var pirata = _mapper.Map<PirataModel>(model);
-            
+
             if (model.Capitao != null)
             {
                 await _pirataPersist.AddPirataWithExistingCapitaoAsync(pirata, pirata.Capitao);
@@ -74,13 +75,19 @@ public class PirataService : IPirataService
 
     }
 
-    public async Task<PirataDto[]> GetAllPiratasAsync()
+    public async Task<PageList<PirataDto>> GetAllPiratasAsync(PageParams pageParams)
     {
         try
         {
-            var piratas = await _pirataPersist.GetAllPiratasAsync();
+            var piratas = await _pirataPersist.GetAllPiratasAsync(pageParams);
             if (piratas == null) return null;
-            var resultado = _mapper.Map<PirataDto[]>(piratas); //mapeando para o tipo de retorno
+            var resultado = _mapper.Map<PageList<PirataDto>>(piratas);
+
+            resultado.CurrentPage = piratas.CurrentPage; // mapeamento manual de propriedades
+            resultado.TotalPages = piratas.TotalPages;
+            resultado.PageSize = piratas.PageSize;
+            resultado.TotalCount = piratas.TotalCount;
+
             return resultado;
         }
         catch (System.Exception e)
@@ -88,14 +95,6 @@ public class PirataService : IPirataService
 
             throw new Exception(e.Message);
         }
-    }
-
-    public async Task<PirataDto[]> GetAllPiratasByNomeAsync(string nome)
-    {
-        var piratas = await _pirataPersist.GetAllPiratasByNomeAsync(nome);
-        if (piratas == null) return null;
-        var resultado = _mapper.Map<PirataDto[]>(piratas);
-        return resultado;
     }
 
     public async Task<PirataDto> GetPirataByIdAsync(int pirataId)

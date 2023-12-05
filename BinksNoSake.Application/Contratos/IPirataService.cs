@@ -1,5 +1,6 @@
 using BinksNoSake.Application.Dtos;
 using BinksNoSake.Domain.Models;
+using BinksNoSake.Persistence.Pagination;
 
 namespace BinksNoSake.Application.Contratos;
 public interface IPirataService
@@ -8,6 +9,5 @@ public interface IPirataService
     Task<PirataDto> GetPirataByIdAsync(int pirataId);
     Task<PirataDto> UpdatePirata(int pirataId, PirataDto model);
     Task<bool> DeletePirata(int pirataId);
-    Task<PirataDto[]> GetAllPiratasAsync();
-    Task<PirataDto[]> GetAllPiratasByNomeAsync(string nome);
+    Task<PageList<PirataDto>> GetAllPiratasAsync(PageParams pageParams);
 }

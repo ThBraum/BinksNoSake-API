@@ -23,7 +23,7 @@ public class AcessoController : ControllerBase
         try
         {
             var user = await _accountService.GetUserByUsernameAsync(accountLoginDto.Username);
-            if (user == null) return Unauthorized("Usuário não cadastrado!");
+            if (user == null) return NotFound("Usuário não cadastrado");
 
             var result = await _accountService.CheckUserPasswordAsync(user, accountLoginDto.Password);
             if (result.Succeeded)
@@ -39,7 +39,7 @@ public class AcessoController : ControllerBase
                     refreshToken = user.RefreshToken
                 });
             }
-            return Unauthorized("Usuário ou senha incorretos!");
+            return Unauthorized("Usuário e/ou Senha incorreto(s)");
         }
         catch (System.Exception e)
         {
