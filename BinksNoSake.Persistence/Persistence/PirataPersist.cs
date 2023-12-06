@@ -34,8 +34,10 @@ public class PirataPersist : IPirataPersist
         IQueryable<PirataModel> query = _context.Piratas.AsNoTracking()
             .Include(p => p.Capitao)
             .Include(p => p.Navios);
-        
-        query.Where(p => p.Nome.ToLower().Contains(pageParams.Term.ToLower())).OrderBy(p => p.Id);
+
+        query = query.Where(p => p.Nome.ToLower().Contains(pageParams.Term.ToLower()) ||
+                                p.Funcao.ToLower().Contains(pageParams.Term.ToLower()) ||
+                                p.Objetivo.ToLower().Contains(pageParams.Term.ToLower())).OrderBy(p => p.Id);
 
         return await PageList<PirataModel>.CreateAsync(query, pageParams.PageNumber, pageParams.PageSize);
     }
@@ -46,7 +48,7 @@ public class PirataPersist : IPirataPersist
         IQueryable<PirataModel> query = _context.Piratas.AsNoTracking()
             .Include(p => p.Capitao)
             .Include(p => p.Navios);
-        
+
         query = query.Where(p => p.Id == pirataId).OrderBy(p => p.Id);
 
         return await query.FirstOrDefaultAsync();
