@@ -59,7 +59,7 @@ builder.Services.AddIdentityCore<Account>(options =>
 .AddRoleManager<RoleManager<Role>>()
 .AddSignInManager<SignInManager<Account>>()
 .AddRoleValidator<RoleValidator<Role>>()
-.AddEntityFrameworkStores<BinksNoSakeContext>() 
+.AddEntityFrameworkStores<BinksNoSakeContext>()
 .AddDefaultTokenProviders();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -77,9 +77,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
-    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve; //Evita o erro de referência circular
+    // options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve; //Evita o erro de referência circular
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); //Converte os enums para string
-});
+}).
+AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

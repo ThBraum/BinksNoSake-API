@@ -15,8 +15,7 @@ public static class Pagination
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
-        response.Headers.Add("Pagination", JsonSerializer.Serialize(pagination, options
-        ));
+        response.Headers.Add("Pagination", JsonSerializer.Serialize(pagination, options));
         response.Headers.Add("Access-Control-Expose-Headers", "Pagination");
     }
 }
