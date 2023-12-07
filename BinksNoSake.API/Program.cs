@@ -59,7 +59,7 @@ builder.Services.AddIdentityCore<Account>(options =>
 .AddRoleManager<RoleManager<Role>>()
 .AddSignInManager<SignInManager<Account>>()
 .AddRoleValidator<RoleValidator<Role>>()
-.AddEntityFrameworkStores<BinksNoSakeContext>()
+.AddEntityFrameworkStores<BinksNoSakeContext>() 
 .AddDefaultTokenProviders();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
