@@ -9,7 +9,7 @@ RUN dotnet restore
 RUN dotnet publish -c Release -o /App --no-restore
 
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:6.0.302
+FROM mcr.microsoft.com/dotnet/aspnet:6.0.25
 WORKDIR /App
 COPY --from=build-env /App .
 COPY ./BinksNoSake.API/Resources ./Resources
