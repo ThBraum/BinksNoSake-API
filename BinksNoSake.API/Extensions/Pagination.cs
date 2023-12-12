@@ -8,9 +8,9 @@ using BinksNoSake.API.Models;
 namespace BinksNoSake.API.Extensions;
 public static class Pagination
 {
-    public static void AddPagination(this HttpResponse response, int currentPage, int itemsPerPage, int totalItems, int totalPages)
+    public static void AddPagination(this HttpResponse response, int currentPage, int pageSize, int totalItems, int totalPages)
     {
-        var pagination = new PaginationHeader(currentPage, totalItems, itemsPerPage, totalPages);
+        var pagination = new PaginationHeader(currentPage, totalItems, pageSize, totalPages);
         var options = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
