@@ -59,7 +59,7 @@ builder.Services.AddIdentityCore<Account>(options =>
 .AddRoleManager<RoleManager<Role>>()
 .AddSignInManager<SignInManager<Account>>()
 .AddRoleValidator<RoleValidator<Role>>()
-.AddEntityFrameworkStores<BinksNoSakeContext>() 
+.AddEntityFrameworkStores<BinksNoSakeContext>()
 .AddDefaultTokenProviders();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -118,11 +118,12 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// if (app.Environment.IsDevelopment())
+// {
+// }
+app.UseSwagger();
+
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
