@@ -13,7 +13,7 @@ These instructions will help you get a copy of the project up and running on you
 
 ### Prerequisites
 
-- .NET Core SDK
+- .NET Core SDK 6.0.302
 
 
 ### Installing and running
