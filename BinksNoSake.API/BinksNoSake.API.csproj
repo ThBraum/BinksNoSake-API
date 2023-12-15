@@ -30,4 +30,8 @@
     <ProjectReference Include="..\BinksNoSake.Persistence\BinksNoSake.Persistence.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="BinksNoSake.Tests" />
+  </ItemGroup>
+  
 </Project>

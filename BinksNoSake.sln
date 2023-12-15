@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BinksNoSake.Application", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BinksNoSake.Persistence", "BinksNoSake.Persistence\BinksNoSake.Persistence.csproj", "{4A9CCFBE-E235-45F5-8048-7E5777EC676F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BinksNoSake.Tests", "BinksNoSake.Tests\BinksNoSake.Tests.csproj", "{1573068E-7B14-4CD9-A09D-5859A050421B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{4A9CCFBE-E235-45F5-8048-7E5777EC676F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A9CCFBE-E235-45F5-8048-7E5777EC676F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A9CCFBE-E235-45F5-8048-7E5777EC676F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1573068E-7B14-4CD9-A09D-5859A050421B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1573068E-7B14-4CD9-A09D-5859A050421B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1573068E-7B14-4CD9-A09D-5859A050421B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1573068E-7B14-4CD9-A09D-5859A050421B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
