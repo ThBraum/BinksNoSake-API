@@ -13,6 +13,7 @@ using BinksNoSake.Tests.UnitTests.BinksNoSake.Application.UnitTests.Mocks;
 using Moq;
 using Moq.Language.Flow;
 using Shouldly;
+using Xunit;
 
 namespace BinksNoSake.Tests.UnitTests.BinksNoSake.Persistence.UnitTests;
 public class PirataPersist
