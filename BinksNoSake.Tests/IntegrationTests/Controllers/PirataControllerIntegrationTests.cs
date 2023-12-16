@@ -12,6 +12,7 @@ using BinksNoSake.Application.Dtos;
 using Microsoft.OpenApi.Any;
 using AutoMapper;
 using BinksNoSake.Domain.Models;
+using Xunit;
 
 namespace BinksNoSake.Tests.IntegrationTests.Controllers;
 public class PirataControllerIntegrationTests
