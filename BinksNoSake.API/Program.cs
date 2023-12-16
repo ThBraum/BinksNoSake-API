@@ -136,8 +136,8 @@ app.UseCors("CorsPolicy"); //Configuração do CORS
 app.UseStaticFiles(new StaticFileOptions()
 {
     FileProvider = new PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "Resources")),
-    RequestPath = new PathString("/Resources")
+        Path.Combine(Directory.GetCurrentDirectory(), "Resources", "Images")),
+    RequestPath = new PathString("/Resources/Images")
 });
 
 app.MapControllers();
