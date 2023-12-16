@@ -118,7 +118,7 @@ public class PirataService : IPirataService
         try
         {
             var pirata = await _pirataPersist.GetPirataByIdAsync(pirataId);
-            if (pirata == null) throw new Exception("Pirata não encontrado.");
+            if (pirata == null) return null;
             model.Id = pirata.Id;
             _mapper.Map(model, pirata); //atualizando o pirata com os dados do model, mapeia o model para o pirata
             _geralPersist.Update<PirataModel>(pirata);
