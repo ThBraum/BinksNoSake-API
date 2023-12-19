@@ -24,15 +24,13 @@ public class AcessoController : ControllerBase
     private readonly SignInManager<Account> _signInManager;
     private readonly UserManager<Account> _userManager;
     private readonly IConfiguration _configuration;
-    private IMapper _mapper;
-    public AcessoController(IAccountService accountService, ITokenService tokenService, SignInManager<Account> signInManager, UserManager<Account> userManager, IConfiguration configuration, IMapper mapper)
+    public AcessoController(IAccountService accountService, ITokenService tokenService, SignInManager<Account> signInManager, UserManager<Account> userManager, IConfiguration configuration)
     {
         _signInManager = signInManager;
         _userManager = userManager;
         _tokenService = tokenService;
         _accountService = accountService;
         _configuration = configuration;
-        _mapper = mapper;
     }
 
     [HttpPost("login")]
