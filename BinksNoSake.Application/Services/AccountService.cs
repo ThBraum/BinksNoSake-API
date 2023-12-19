@@ -3,9 +3,11 @@ using BinksNoSake.Application.Contratos;
 using BinksNoSake.Application.Dtos;
 using BinksNoSake.Domain.Identity;
 using BinksNoSake.Persistence.Contratos;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 
 namespace BinksNoSake.Application.Services;
 public class AccountService : IAccountService
@@ -15,14 +17,21 @@ public class AccountService : IAccountService
     private readonly IAccountPersist _accountPersist;
     private readonly IMapper _mapper;
     private readonly IWebHostEnvironment _hostEnvironment;
+    private readonly IConfigurationSection _googleAuthSettings;
 
-    public AccountService(UserManager<Account> userManager, SignInManager<Account> signInManager, IMapper mapper, IAccountPersist accountPersist, IWebHostEnvironment hostEnvironment)
+    public AccountService(UserManager<Account> userManager, 
+                        SignInManager<Account> signInManager, 
+                        IMapper mapper, 
+                        IAccountPersist accountPersist, 
+                        IWebHostEnvironment hostEnvironment,
+                        IConfiguration configuration)
     {
         _hostEnvironment = hostEnvironment;
         _accountPersist = accountPersist;
         _signInManager = signInManager;
         _userManager = userManager;
         _mapper = mapper;
+        _googleAuthSettings = configuration.GetSection("GoogleAuthSettings");
     }
 
     public async Task<SignInResult> CheckUserPasswordAsync(AccountUpdateDto accountUpdateDto, string password)
