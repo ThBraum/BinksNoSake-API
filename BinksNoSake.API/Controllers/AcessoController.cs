@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 
 namespace BinksNoSake.API.Controllers;
 [ApiController]
@@ -24,13 +25,15 @@ public class AcessoController : ControllerBase
     private readonly SignInManager<Account> _signInManager;
     private readonly UserManager<Account> _userManager;
     private readonly IConfiguration _configuration;
-    public AcessoController(IAccountService accountService, ITokenService tokenService, SignInManager<Account> signInManager, UserManager<Account> userManager, IConfiguration configuration)
+    private readonly IMapper _mapper;
+    public AcessoController(IAccountService accountService, ITokenService tokenService, SignInManager<Account> signInManager, UserManager<Account> userManager, IConfiguration configuration, IMapper mapper)
     {
         _signInManager = signInManager;
         _userManager = userManager;
         _tokenService = tokenService;
         _accountService = accountService;
         _configuration = configuration;
+        _mapper = mapper;
     }
 
     [HttpPost("login")]
@@ -66,36 +69,42 @@ public class AcessoController : ControllerBase
     }
 
     [HttpPost("LoginWithGoogle")]
-    public async Task<IActionResult> LoginWithGoogleExternal([FromBody] string credential)
+    [AllowAnonymous]
+    public async Task<IActionResult> ExchangeFirebaseToken([FromBody] FirebaseTokenRequest request)
     {
         try
         {
-            var settings = new GoogleJsonWebSignature.ValidationSettings()
-            {
-                Audience = new List<string>() { _configuration["Google:ClientId"] }
-            };
+            var firebaseToken = request.FireBaseToken;
+            var validatedToken = await ValidateFirebaseToken(firebaseToken);
 
-            var payload = await GoogleJsonWebSignature.ValidateAsync(credential, settings);
+            var generatedUsername = GeneratedValidUsername(validatedToken.Name);
 
-            var generatedUsername = GeneratedValidUsername(payload.Name);
-            
             var user = await _accountService.GetUserByUsernameAsync(generatedUsername);
 
             if (user == null)
             {
-                var newUser = new Account
+                user = new AccountUpdateDto
                 {
-                    UserName = generatedUsername,
-                    Email = payload.Email,
-                    PrimeiroNome = payload.GivenName,
-                    UltimoNome = payload.FamilyName,
-                    EmailConfirmed = true
+                    Username = generatedUsername,
+                    Email = validatedToken.Email,
+                    PrimeiroNome = validatedToken.GivenName ?? validatedToken.Name.Split(" ")[0] ?? null,
+                    ImagemURL = validatedToken.Picture ?? null,
                 };
 
-                var result = await _userManager.CreateAsync(newUser);
-                if (!result.Succeeded) return BadRequest(result.Errors);
-
-                user = await _accountService.GetUserByUsernameAsync(payload.Name);
+                var userMapped = _mapper.Map<Account>(user);
+                var result = await _userManager.CreateAsync(userMapped);
+                if (result.Succeeded)
+                {
+                    var userResult = await _accountService.GetUserByUsernameAsync(generatedUsername);
+                    if (userResult != null)
+                    {
+                        user = userResult;
+                    }
+                }
+                else
+                {
+                    return BadRequest(result.Errors);
+                }
             }
 
             user.Token = await _tokenService.CreateToken(user);
@@ -116,43 +125,41 @@ public class AcessoController : ControllerBase
         }
     }
 
-    private string GeneratedValidUsername(string username)
+   
+    [NonAction]
+    private async Task<FirebaseToken> ValidateFirebaseToken(string fireBaseToken)
     {
-        string validUsername = new string(username.Where(c =>  char.IsLetterOrDigit(c)).ToArray());
+        try
+        {
 
-        return validUsername;
+            var parts = fireBaseToken.Split('.');
+
+            if (parts.Length != 3)
+            {
+                throw new Exception("Token inválido");
+            }
+
+            var payload = parts[1];
+
+            var decodedPayloadBytes = Base64UrlEncoder.DecodeBytes(payload);
+            var payloadJson = Encoding.UTF8.GetString(decodedPayloadBytes);
+
+            var firebaseValidatedToken = JsonConvert.DeserializeObject<FirebaseToken>(payloadJson);
+
+            return firebaseValidatedToken;
+        }
+        catch (System.Exception e)
+        {
+            throw new Exception($"Erro ao validar token do firebase: {e.Message}");
+        }
     }
 
-    [NonAction]
-    public dynamic JWTGenerator(Account user)
+
+    private string GeneratedValidUsername([FromBody] string username)
     {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-        
-        var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.UserName),
-        };
-        
-        var roles = _userManager.GetRolesAsync(user);
-        foreach (var role in roles.Result)
-        {
-            new Claim(ClaimTypes.Role, role);
-        }
+        string validUsername = new string(username.Where(c => char.IsLetterOrDigit(c)).ToArray());
 
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddHours(12),
-            SigningCredentials = creds
-        };
-
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        var tokenString = tokenHandler.WriteToken(token);
-
-        return new { token = tokenString, username = user.UserName };
+        return validUsername;
     }
 
     [HttpPost("refreshToken")]
@@ -182,8 +189,4 @@ public class AcessoController : ControllerBase
             return this.StatusCode(StatusCodes.Status401Unauthorized, $"Erro {e.Message}");
         }
     }
-}
-
-internal interface IMapper
-{
 }
