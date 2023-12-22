@@ -19,10 +19,10 @@ public class AccountService : IAccountService
     private readonly IWebHostEnvironment _hostEnvironment;
     private readonly IConfigurationSection _googleAuthSettings;
 
-    public AccountService(UserManager<Account> userManager, 
-                        SignInManager<Account> signInManager, 
-                        IMapper mapper, 
-                        IAccountPersist accountPersist, 
+    public AccountService(UserManager<Account> userManager,
+                        SignInManager<Account> signInManager,
+                        IMapper mapper,
+                        IAccountPersist accountPersist,
                         IWebHostEnvironment hostEnvironment,
                         IConfiguration configuration)
     {
@@ -40,6 +40,11 @@ public class AccountService : IAccountService
         {
             var user = await _userManager.FindByNameAsync(accountUpdateDto.Username.ToLower());
 
+            if (user == null)
+            {
+                user = await _userManager.FindByEmailAsync(accountUpdateDto.Email.ToLower());
+                if (user == null) return SignInResult.Failed;
+            }
             return await _signInManager.CheckPasswordSignInAsync(user, password, false);
         }
         catch (System.Exception e)
@@ -74,6 +79,32 @@ public class AccountService : IAccountService
     {
         var imagePath = Path.Combine(_hostEnvironment.ContentRootPath, @"Resources/Images", imageName);
         if (System.IO.File.Exists(imagePath)) System.IO.File.Delete(imagePath);
+    }
+
+    public async Task<AccountUpdateDto> GetUserByCredentialAsync(string credential)
+    {
+        var user = await _userManager.FindByNameAsync(credential.ToLower());
+        if (user == null)
+        {
+            user = await _userManager.FindByEmailAsync(credential.ToLower());
+            if (user == null) return null;
+        }
+
+        return _mapper.Map<AccountUpdateDto>(user);
+    }
+
+    public async Task<AccountUpdateDto> GetUserByEmailAsync(string email)
+    {
+        try
+        {
+            var user = await _accountPersist.GetUserByEmailAsync(email);
+            if (user == null) return null;
+            return _mapper.Map<AccountUpdateDto>(user);
+        }
+        catch (System.Exception e)
+        {
+            throw new Exception($"Erro ao obter usuário. {e.Message}");
+        }
     }
 
     public async Task<AccountUpdateDto> GetUserByUsernameAsync(string username)

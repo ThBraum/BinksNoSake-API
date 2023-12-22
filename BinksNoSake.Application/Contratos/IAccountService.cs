@@ -8,6 +8,8 @@ public interface IAccountService
 {
     Task<bool> UserExists(string username);
     Task<AccountUpdateDto> GetUserByUsernameAsync(string username);
+    Task<AccountUpdateDto> GetUserByEmailAsync(string email);
+    Task<AccountUpdateDto> GetUserByCredentialAsync(string credential);
     Task<SignInResult> CheckUserPasswordAsync(AccountUpdateDto accountUpdateDto, string password);
     Task<AccountDto> CreateAccountAsync(AccountDto userDto);
     Task<AccountUpdateDto> UpdateAccount(AccountUpdateDto accountUpdateDto);

@@ -42,8 +42,8 @@ public class AcessoController : ControllerBase
     {
         try
         {
-            var user = await _accountService.GetUserByUsernameAsync(accountLoginDto.Username);
-            if (user == null) return NotFound("Usuário não cadastrado");
+            var user = await _accountService.GetUserByCredentialAsync(accountLoginDto.Username);
+            if (user == null) return NotFound("O email ou username que você informou não está conectado a uma conta.");
 
             var result = await _accountService.CheckUserPasswordAsync(user, accountLoginDto.Password);
             if (result.Succeeded)
@@ -55,6 +55,10 @@ public class AcessoController : ControllerBase
                 {
                     username = user.Username,
                     primeiroNome = user.PrimeiroNome,
+                    ultimoNome = user.UltimoNome,
+                    email = user.Email,
+                    imagemURL = user.ImagemURL,
+                    funcao = user.Funcao,
                     token = user.Token,
                     refreshToken = user.RefreshToken
                 });
@@ -77,28 +81,33 @@ public class AcessoController : ControllerBase
             var firebaseToken = request.FireBaseToken;
             var validatedToken = await ValidateFirebaseToken(firebaseToken);
 
-            var generatedUsername = GeneratedValidUsername(validatedToken.Name);
+            var existingUser = await _accountService.GetUserByEmailAsync(validatedToken.Email);
 
-            var user = await _accountService.GetUserByUsernameAsync(generatedUsername);
-
-            if (user == null)
+            if (existingUser == null)
             {
-                user = new AccountUpdateDto
+                var generatedUsername = GeneratedValidUsername(validatedToken.Name);
+                var uniqueUsername = await GenerateUniqueUsername(generatedUsername);
+
+                var nameParts = validatedToken.Name.Split(" ");
+                var primeiroNome = nameParts.Length > 0 ? nameParts[0] : null;
+                var ultimoNome = nameParts.Length > 1 ? nameParts[1] : null;
+                existingUser = new AccountUpdateDto
                 {
-                    Username = generatedUsername,
+                    Username = uniqueUsername,
                     Email = validatedToken.Email,
-                    PrimeiroNome = validatedToken.GivenName ?? validatedToken.Name.Split(" ")[0] ?? null,
+                    PrimeiroNome = validatedToken.GivenName ?? primeiroNome ?? null,
+                    UltimoNome = validatedToken.Family_name ?? ultimoNome ?? null,
                     ImagemURL = validatedToken.Picture ?? null,
                 };
 
-                var userMapped = _mapper.Map<Account>(user);
+                var userMapped = _mapper.Map<Account>(existingUser);
                 var result = await _userManager.CreateAsync(userMapped);
                 if (result.Succeeded)
                 {
-                    var userResult = await _accountService.GetUserByUsernameAsync(generatedUsername);
+                    var userResult = await _accountService.GetUserByUsernameAsync(uniqueUsername);
                     if (userResult != null)
                     {
-                        user = userResult;
+                        existingUser = userResult;
                     }
                 }
                 else
@@ -107,16 +116,20 @@ public class AcessoController : ControllerBase
                 }
             }
 
-            user.Token = await _tokenService.CreateToken(user);
-            user.RefreshToken = await _tokenService.GenereteRefreshToken();
-            _tokenService.SaveRefreshToken(user.Username, user.RefreshToken);
+            existingUser.Token = await _tokenService.CreateToken(existingUser);
+            existingUser.RefreshToken = await _tokenService.GenereteRefreshToken();
+            _tokenService.SaveRefreshToken(existingUser.Username, existingUser.RefreshToken);
 
             return Ok(new
             {
-                username = user.Username,
-                primeiroNome = user.PrimeiroNome,
-                token = user.Token,
-                refreshToken = user.RefreshToken
+                username = existingUser.Username,
+                primeiroNome = existingUser.PrimeiroNome,
+                ultimoNome = existingUser.UltimoNome,
+                email = existingUser.Email,
+                imagemURL = existingUser.ImagemURL,
+                funcao = existingUser.Funcao,
+                token = existingUser.Token,
+                refreshToken = existingUser.RefreshToken
             });
         }
         catch (System.Exception e)
@@ -125,7 +138,6 @@ public class AcessoController : ControllerBase
         }
     }
 
-   
     [NonAction]
     private async Task<FirebaseToken> ValidateFirebaseToken(string fireBaseToken)
     {
@@ -160,6 +172,18 @@ public class AcessoController : ControllerBase
         string validUsername = new string(username.Where(c => char.IsLetterOrDigit(c)).ToArray());
 
         return validUsername;
+    }
+
+    private async Task<string> GenerateUniqueUsername(string baseUsername)
+    {
+        string generatedUsername = baseUsername;
+
+        while (await _accountService.UserExists(generatedUsername))
+        {
+            generatedUsername = baseUsername + Guid.NewGuid().ToString().Substring(0, 4);
+        }
+
+        return generatedUsername;
     }
 
     [HttpPost("refreshToken")]
