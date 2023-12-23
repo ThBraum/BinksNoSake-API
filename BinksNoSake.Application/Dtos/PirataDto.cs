@@ -3,11 +3,6 @@ using System.Text.Json.Serialization;
 using BinksNoSake.Domain.Models;
 
 namespace BinksNoSake.Application.Dtos;
-/// <summary>
-/// Representa um pirata
-/// </summary> <summary>
-/// Representa um pirata2
-/// </summary>
 public class PirataDto
 {
     [Key]

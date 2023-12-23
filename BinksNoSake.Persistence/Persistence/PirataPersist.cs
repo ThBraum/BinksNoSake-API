@@ -14,7 +14,9 @@ public class PirataPersist : IPirataPersist
 
     public async Task<PirataModel> AddPirataWithExistingCapitaoAsync(PirataModel pirata, CapitaoModel capitao)
     {
-        var capitaoExistente = await _context.Capitaes.FindAsync(capitao.Id);
+        var capitaoExistente = await _context.Capitaes.Include(c => c.Timoneiro)
+                                        .FirstOrDefaultAsync(c => c.Id == capitao.Id);
+                                        
         if (capitaoExistente != null)
         {
             pirata.Capitao = capitaoExistente;

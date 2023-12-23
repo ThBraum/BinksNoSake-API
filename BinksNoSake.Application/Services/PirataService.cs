@@ -28,7 +28,7 @@ public class PirataService : IPirataService
             {
                 model.Capitao = await GetCapitaoByIdOrNome(model.Capitao);
             }
-            if (model.CapitaoId != null)
+            else if (model.CapitaoId != null)
             {
                 model.Capitao = await GetCapitaoId(model, model.Capitao);
             }
@@ -149,13 +149,11 @@ public class PirataService : IPirataService
         else if (capitao.Nome != null)
         {
             var capitaoExistenteNome = await _capitaoPersist.GetAllCapitaesAsync(new PageParams() { Term = capitao.Nome });
-            if (capitaoExistenteNome != null)
+            if (capitaoExistenteNome != null && capitaoExistenteNome.Count > 0)
             {
-                foreach (var capitaoItem in capitaoExistenteNome)
-                {
-                    _geralPersist.Detach<CapitaoModel>(capitaoItem); //desacoplando cada item do capitaoExistenteNome
-                }
-                return _mapper.Map<CapitaoDto>(capitaoExistenteNome);
+                var capitaoExistenteNomePrimeiro = capitaoExistenteNome.FirstOrDefault();
+                _geralPersist.Detach<CapitaoModel>(capitaoExistenteNomePrimeiro); //desacoplando o capitaoExistenteNomePrimeiro
+                return _mapper.Map<CapitaoDto>(capitaoExistenteNomePrimeiro);
             }
         }
         return capitao;
