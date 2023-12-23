@@ -4,12 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using BinksNoSake.Domain.Models;
 using BinksNoSake.Persistence.Contratos;
+using BinksNoSake.Persistence.Pagination;
 using Moq;
 
 namespace BinksNoSake.Tests.UnitTests.BinksNoSake.Application.UnitTests.Mocks;
 public class MockCapitaoPersist
 {
-    public static Mock<ICapitaoPersist> GetMockCapitaoPersist()
+    public static Mock<ICapitaoPersist> GetMockCapitaoPersist(PageParams? pageParams)
     {
         var capitaes = new List<CapitaoModel>
         {
@@ -42,18 +43,26 @@ public class MockCapitaoPersist
 
         var mockCapitaoPersist = new Mock<ICapitaoPersist>();
         
-        mockCapitaoPersist.Setup(c => c.GetAllCapitaesAsync()).Returns(Task.FromResult(capitaes.ToArray()));
+        mockCapitaoPersist.Setup(c => c.GetAllCapitaesAsync(It.IsAny<PageParams>()))
+            .ReturnsAsync((PageParams pageParams) => 
+            {
+                if (capitaes == null)
+                {
+                    return new PageList<CapitaoModel>(new List<CapitaoModel>(), 0, pageParams.PageNumber, pageParams.PageSize);
+                }
+
+                var filteredCapitaes = capitaes
+                    .Where(c => c.Nome.ToLower().Contains(pageParams.Term.ToLower()))
+                    .OrderBy(c => c.Id)
+                    .ToList();
+
+                return new PageList<CapitaoModel>(filteredCapitaes, filteredCapitaes.Count(), pageParams.PageNumber, pageParams.PageSize);
+            });
         
         mockCapitaoPersist.Setup(c => c.GetCapitaoByIdAsync(It.IsAny<int>()))
             .ReturnsAsync((int capitaoId) =>
             {
                 return capitaes.FirstOrDefault(c => c.Id == capitaoId);
-            });
-
-        mockCapitaoPersist.Setup(c => c.GetCapitaoByNomeAsync(It.IsAny<string>()))
-            .ReturnsAsync((string nome) =>
-            {
-                return capitaes.FirstOrDefault(c => c.Nome == nome);
             });
 
         return mockCapitaoPersist;

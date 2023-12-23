@@ -1,5 +1,6 @@
 using BinksNoSake.Domain.Models;
 using BinksNoSake.Persistence.Contratos;
+using BinksNoSake.Persistence.Pagination;
 using Microsoft.EntityFrameworkCore;
 
 namespace BinksNoSake.Persistence.Persistence;
@@ -12,29 +13,15 @@ public class CapitaoPersist : ICapitaoPersist
         _context = context;
     }
 
-    public async Task<CapitaoModel[]> GetAllCapitaesAsync()
+    public async Task<PageList<CapitaoModel>> GetAllCapitaesAsync(PageParams pageParams)
     {
         IQueryable<CapitaoModel> query = _context.Capitaes.AsNoTracking()
             .Include(c => c.Piratas)
             .Include(c => c.Timoneiro);
 
-        query.OrderBy(p => p.Id);
+        query = query.Where(c => c.Nome.ToLower().Contains(pageParams.Term.ToLower())).OrderBy(c => c.Id);
 
-        return await query.ToArrayAsync();
-    }
-
-    public async Task<CapitaoModel> GetCapitaoByNomeAsync(string nome)
-    {
-        IQueryable<CapitaoModel> query = _context.Capitaes.AsNoTracking()
-            .Include(c => c.Piratas)
-            .Include(c => c.Timoneiro);
-
-        var capitao = await query
-            .Where(c => c.Nome.ToLower().Contains(nome.ToLower()))
-            .OrderBy(c => c.Id)
-            .FirstOrDefaultAsync();
-
-        return capitao;
+        return await PageList<CapitaoModel>.CreateAsync(query, pageParams.PageNumber, pageParams.PageSize);
     }
 
     public async Task<CapitaoModel> GetCapitaoByIdAsync(int capitaoId)

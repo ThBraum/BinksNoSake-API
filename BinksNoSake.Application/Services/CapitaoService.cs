@@ -3,6 +3,7 @@ using BinksNoSake.Application.Contratos;
 using BinksNoSake.Application.Dtos;
 using BinksNoSake.Domain.Models;
 using BinksNoSake.Persistence.Contratos;
+using BinksNoSake.Persistence.Pagination;
 
 namespace BinksNoSake.Application.Services;
 public class CapitaoService : ICapitaoService
@@ -55,34 +56,24 @@ public class CapitaoService : ICapitaoService
         }
     }
 
-    public async Task<CapitaoDto[]> GetAllCapitaesAsync()
+    public async Task<PageList<CapitaoDto>> GetAllCapitaesAsync(PageParams pageParams)
     {
         try
         {
-            var capitao = await _capitaoPersist.GetAllCapitaesAsync();
-            if (capitao == null) return null;
-            var resultado = _mapper.Map<CapitaoDto[]>(capitao);
+            var capitaes = await _capitaoPersist.GetAllCapitaesAsync(pageParams);
+            if (capitaes == null) return null;
+            var resultado = _mapper.Map<PageList<CapitaoDto>>(capitaes);
+
+            resultado.CurrentPage = capitaes.CurrentPage; // mapeamento manual de propriedades
+            resultado.TotalPages = capitaes.TotalPages;
+            resultado.PageSize = capitaes.PageSize;
+            resultado.TotalCount = capitaes.TotalCount;
+
             return resultado;
         }
         catch (System.Exception e)
         {
 
-            throw new Exception(e.Message);
-        }
-    }
-
-    public async Task<CapitaoDto> GetCapitaoByNomeAsync(string nome)
-    {
-        try
-        {
-            var capitao = await _capitaoPersist.GetCapitaoByNomeAsync(nome);
-            if (capitao == null) return null;
-            var resultado = _mapper.Map<CapitaoDto>(capitao);
-            return resultado;
-        }
-        catch (System.Exception e)
-        {
-            
             throw new Exception(e.Message);
         }
     }

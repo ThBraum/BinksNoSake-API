@@ -148,10 +148,13 @@ public class PirataService : IPirataService
         }
         else if (capitao.Nome != null)
         {
-            var capitaoExistenteNome = await _capitaoPersist.GetCapitaoByNomeAsync(capitao.Nome);
+            var capitaoExistenteNome = await _capitaoPersist.GetAllCapitaesAsync(new PageParams() { Term = capitao.Nome });
             if (capitaoExistenteNome != null)
             {
-                _geralPersist.Detach<CapitaoModel>(capitaoExistenteNome); //desacoplando o capitaoExistenteNome
+                foreach (var capitaoItem in capitaoExistenteNome)
+                {
+                    _geralPersist.Detach<CapitaoModel>(capitaoItem); //desacoplando cada item do capitaoExistenteNome
+                }
                 return _mapper.Map<CapitaoDto>(capitaoExistenteNome);
             }
         }

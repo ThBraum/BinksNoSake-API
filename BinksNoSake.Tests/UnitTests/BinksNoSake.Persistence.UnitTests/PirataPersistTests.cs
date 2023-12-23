@@ -32,7 +32,7 @@ public class PirataPersist
         };
 
         _mockPirataPersist = MockPirataPersist.GetMockPirataPersist(pageParams);
-        _mockCapitaoPersist = MockCapitaoPersist.GetMockCapitaoPersist();
+        _mockCapitaoPersist = MockCapitaoPersist.GetMockCapitaoPersist(pageParams);
         _mockGeralPersist = MockGeralPersist.GetMockGeralPersist();
 
         var mockMapper = new MapperConfiguration(cfg =>

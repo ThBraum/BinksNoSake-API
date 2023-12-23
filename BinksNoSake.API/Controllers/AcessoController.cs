@@ -187,7 +187,7 @@ public class AcessoController : ControllerBase
     }
 
     [HttpPost("refreshToken")]
-    [AllowAnonymous]
+    [Authorize]
     public async Task<IActionResult> RefreshToken()
     {
         try
@@ -197,11 +197,18 @@ public class AcessoController : ControllerBase
             var username = principal.Identity.Name;
             var savedRefreshToken = await _tokenService.GetRefreshToken(username);
 
+            if (savedRefreshToken != null)
+            {
+                _tokenService.DeleteRefreshToken(username, savedRefreshToken);
+            }
+
             var newJwtToken = await _tokenService.CreateTokenEnumerator(principal.Claims);
             var newRefreshToken = await _tokenService.GenereteRefreshToken();
 
-            _tokenService.DeleteRefreshToken(username, savedRefreshToken);
-            _tokenService.SaveRefreshToken(username, newRefreshToken);
+            var refreshTokenExpiration = DateTime.UtcNow.Add(_tokenService.RefreshTokenExpiration);
+
+            await _tokenService.DeleteExpiredRefreshToken();
+
             return Ok(new
             {
                 token = newJwtToken,

@@ -1,5 +1,7 @@
+using BinksNoSake.API.Extensions;
 using BinksNoSake.Application.Contratos;
 using BinksNoSake.Application.Dtos;
+using BinksNoSake.Persistence.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,12 +21,15 @@ public class CapitaoController : ControllerBase
 
     [HttpGet(Name = "GetAllCapitaes")]
     [AllowAnonymous]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> Get([FromQuery] PageParams pageParams)
     {
         try
         {
-            var capitaes = await _capitaoService.GetAllCapitaesAsync();
+            var capitaes = await _capitaoService.GetAllCapitaesAsync(pageParams);
             if (capitaes == null) return NoContent();
+            
+            Response.AddPagination(capitaes.CurrentPage, capitaes.PageSize, capitaes.TotalCount, capitaes.TotalPages);
+            
             return Ok(capitaes);
         }
         catch (System.Exception e)
@@ -47,23 +52,6 @@ public class CapitaoController : ControllerBase
         {
 
             throw;
-        }
-    }
-
-    [HttpGet("nome/{nome}", Name = "GetCapitaoByNome")]
-    [AllowAnonymous]
-    public async Task<IActionResult> Get(string nome)
-    {
-        try
-        {
-            var capitaes = await _capitaoService.GetCapitaoByNomeAsync(nome);
-            if (capitaes == null) return NoContent();
-            return Ok(capitaes);
-        }
-        catch (System.Exception e)
-        {
-
-            throw new Exception(e.Message);
         }
     }
 

@@ -108,6 +108,8 @@ public class TokenService : ITokenService
 
     public List<(string, string)> _refreshTokens = new();
 
+    public TimeSpan RefreshTokenExpiration { get; } = TimeSpan.FromDays(1);
+
     public async Task<RefreshTokenDto> SaveRefreshToken(string username, string refreshToken)
     {
         try
@@ -120,6 +122,11 @@ public class TokenService : ITokenService
 
             if (await _geralPersist.SaveChangesAsync())
             {
+                var oldRefreshTokens = await _tokenPersit.GetRefreshToken(username);
+                if (oldRefreshTokens != null)
+                {
+                    _tokenPersit.DeleteRefreshToken(username, oldRefreshTokens);
+                }
                 return _mapper.Map<RefreshTokenDto>(new RefreshTokens
                 {
                     Username = username,
@@ -164,6 +171,28 @@ public class TokenService : ITokenService
         {
             
             throw new Exception(e.Message);
+        }
+    }
+
+    public Task<bool> DeleteExpiredRefreshToken()
+    {
+        try
+        {
+            var expiredRefreshTokens = _refreshTokens.Where(x => DateTime.Parse(x.Item2) < DateTime.UtcNow).ToList();
+
+            foreach (var expiredRefreshToken in expiredRefreshTokens)
+            {
+                var username = expiredRefreshToken.Item1;
+                var refreshToken = expiredRefreshToken.Item2;
+
+                _tokenPersit.DeleteRefreshToken(username, refreshToken);
+                _refreshTokens.Remove(expiredRefreshToken);
+            }
+            return Task.FromResult(true);
+        }
+        catch (System.Exception e)
+        {   
+            throw new Exception($"Erro ao excluir Refresh Toekns expirados: {e.Message}");
         }
     }
 }

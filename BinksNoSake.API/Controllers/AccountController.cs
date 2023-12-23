@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using BinksNoSake.API.Extensions;
 using BinksNoSake.Application.Contratos;
 using BinksNoSake.Application.Dtos;
@@ -25,12 +26,38 @@ public class AccountController : ControllerBase
         {
             var username = User.GetUserName();
             var user = await _accountService.GetUserByUsernameAsync(username);
-            user.RefreshToken = await _tokenService.GetRefreshToken(user.Username);
-            return Ok(user);
+
+            if (user == null)
+            {
+                return NoContent();
+            }
+
+            var jwtToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadJwtToken(jwtToken) as JwtSecurityToken;
+
+            if (jsonToken != null && jsonToken.ValidTo < DateTime.UtcNow)
+            {
+                user.Token = await _tokenService.CreateToken(user);
+                await _accountService.UpdateAccount(user);
+                user.RefreshToken = await _tokenService.GetRefreshToken(user.Username);
+            }
+
+            return Ok(new
+            {
+                id = user.Id,
+                username = user.Username,
+                primeiroNome = user.PrimeiroNome,
+                ultimoNome = user.UltimoNome,
+                email = user.Email,
+                imagemURL = user.ImagemURL,
+                funcao = user.Funcao,
+                refreshToken = user.RefreshToken
+            });
         }
         catch (System.Exception e)
         {
-            return this.StatusCode(StatusCodes.Status500InternalServerError, $"Erro {e.Message}");
+            return this.StatusCode(StatusCodes.Status500InternalServerError, $"Erro ao obter usuário: {e.Message}");
         }
     }
 
@@ -64,7 +91,11 @@ public class AccountController : ControllerBase
     {
         try
         {
-            if (accountUpdateDto.Username != User.GetUserName()) return Unauthorized("Usuário Inválido");
+            if (accountUpdateDto.Username != User.GetUserName())
+            {
+                var IsUsernamemAvailable = await _accountService.IsUsernameAvailable(accountUpdateDto.Username);
+                if (!IsUsernamemAvailable) return Conflict("Username não disponível. Tente outro.");
+            }
 
             var user = await _accountService.GetUserByUsernameAsync(User.GetUserName());
             if (user == null) return Unauthorized("Usuário Inválido");

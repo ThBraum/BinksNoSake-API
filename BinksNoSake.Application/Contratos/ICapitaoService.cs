@@ -1,5 +1,6 @@
 using BinksNoSake.Application.Dtos;
 using BinksNoSake.Domain.Models;
+using BinksNoSake.Persistence.Pagination;
 
 namespace BinksNoSake.Application.Contratos;
 public interface ICapitaoService
@@ -8,6 +9,5 @@ public interface ICapitaoService
     Task<CapitaoDto> GetCapitaoByIdAsync(int capitaoId);
     Task<CapitaoDto> UpdateCapitao(int capitaoId, CapitaoDto model);
     Task<bool> DeleteCapitao(int capitaoId);
-    Task<CapitaoDto[]> GetAllCapitaesAsync();
-    Task<CapitaoDto> GetCapitaoByNomeAsync(string nome);
+    Task<PageList<CapitaoDto>> GetAllCapitaesAsync(PageParams pageParams);
 }

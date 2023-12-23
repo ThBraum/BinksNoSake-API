@@ -59,6 +59,7 @@ public class AccountService : IAccountService
         try
         {
             var user = _mapper.Map<Account>(accountDto);
+            user.NormalizedEmail = user.Email?.ToUpper();
             var result = await _userManager.CreateAsync(user, accountDto.Password);
 
             if (result.Succeeded)
@@ -83,10 +84,10 @@ public class AccountService : IAccountService
 
     public async Task<AccountUpdateDto> GetUserByCredentialAsync(string credential)
     {
-        var user = await _userManager.FindByNameAsync(credential.ToLower());
+        var user = await _userManager.FindByNameAsync(credential);
         if (user == null)
         {
-            user = await _userManager.FindByEmailAsync(credential.ToLower());
+            user = await _userManager.FindByEmailAsync(credential);
             if (user == null) return null;
         }
 
@@ -122,6 +123,12 @@ public class AccountService : IAccountService
         }
     }
 
+    public Task<bool> IsUsernameAvailable(string username)
+    {
+        var existingUser = _accountPersist.GetUserByUsernameAsync(username);
+        return existingUser.Result == null ? Task.FromResult(true) : Task.FromResult(false);
+    }
+
     public async Task<string> SaveImage(IFormFile image)
     {
         string imageName = new String(Path.GetFileNameWithoutExtension(image.FileName)
@@ -144,13 +151,14 @@ public class AccountService : IAccountService
             var user = await _accountPersist.GetUserByUsernameAsync(accountUpdateDto.Username);
             if (user == null) return null;
             accountUpdateDto.Id = user.Id;
+            _mapper.Map(accountUpdateDto, user);
 
             if (accountUpdateDto.Password != null)
             {
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
                 var result = await _userManager.ResetPasswordAsync(user, token, accountUpdateDto.Password);
             }
-            _accountPersist.Update<Account>(user);
+            _accountPersist.Update<Account>(user); 
 
             if (await _accountPersist.SaveChangesAsync())
             {
