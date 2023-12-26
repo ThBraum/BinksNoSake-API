@@ -15,13 +15,6 @@ These instructions will help you get a copy of the project up and running on you
 
 - .NET Core SDK 6.0.302
 
-### Running tests
-
-Run 
-```console
-dotnet test
-```
-
 ### Installing and running
 
 1. Clone the repository to your local machine.
@@ -36,4 +29,11 @@ cd your-repository
 ```console
 dotnet build
 dotnet run
+```
+
+### Running tests
+
+Run 
+```console
+dotnet test
 ```
