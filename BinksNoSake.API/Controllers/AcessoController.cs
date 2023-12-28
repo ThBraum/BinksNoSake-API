@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using AutoMapper;
 using BinksNoSake.API.Extensions;
+using BinksNoSake.API.Helpers;
 using BinksNoSake.Application.Contratos;
 using BinksNoSake.Application.Dtos;
 using BinksNoSake.Domain.Identity;
@@ -26,7 +27,16 @@ public class AcessoController : ControllerBase
     private readonly UserManager<Account> _userManager;
     private readonly IConfiguration _configuration;
     private readonly IMapper _mapper;
-    public AcessoController(IAccountService accountService, ITokenService tokenService, SignInManager<Account> signInManager, UserManager<Account> userManager, IConfiguration configuration, IMapper mapper)
+    private readonly IUtil _util;
+
+    private readonly string _destino = "Images";
+    public AcessoController(IAccountService accountService, 
+                            ITokenService tokenService, 
+                            SignInManager<Account> signInManager, 
+                            UserManager<Account> userManager, 
+                            IConfiguration configuration, 
+                            IMapper mapper,
+                            IUtil util)
     {
         _signInManager = signInManager;
         _userManager = userManager;
@@ -34,6 +44,7 @@ public class AcessoController : ControllerBase
         _accountService = accountService;
         _configuration = configuration;
         _mapper = mapper;
+        _util = util;
     }
 
     [HttpPost("login")]
@@ -97,7 +108,7 @@ public class AcessoController : ControllerBase
                     Email = validatedToken.Email,
                     PrimeiroNome = validatedToken.GivenName ?? primeiroNome ?? null,
                     UltimoNome = validatedToken.Family_name ?? ultimoNome ?? null,
-                    ImagemURL = validatedToken.Picture ?? null,
+                    // ImagemURL = validatedToken.Picture,
                 };
 
                 var userMapped = _mapper.Map<Account>(existingUser);

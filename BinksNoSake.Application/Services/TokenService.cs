@@ -169,7 +169,7 @@ public class TokenService : ITokenService
         }
         catch (System.Exception e)
         {
-            
+
             throw new Exception(e.Message);
         }
     }
@@ -191,7 +191,7 @@ public class TokenService : ITokenService
             return Task.FromResult(true);
         }
         catch (System.Exception e)
-        {   
+        {
             throw new Exception($"Erro ao excluir Refresh Toekns expirados: {e.Message}");
         }
     }

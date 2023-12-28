@@ -30,6 +30,7 @@ public class AccountService : IAccountService
         _accountPersist = accountPersist;
         _signInManager = signInManager;
         _userManager = userManager;
+        _userManager.KeyNormalizer = new UpperInvariantLookupNormalizer();
         _mapper = mapper;
         _googleAuthSettings = configuration.GetSection("GoogleAuthSettings");
     }
@@ -59,7 +60,7 @@ public class AccountService : IAccountService
         try
         {
             var user = _mapper.Map<Account>(accountDto);
-            user.NormalizedEmail = user.Email?.ToUpper();
+
             var result = await _userManager.CreateAsync(user, accountDto.Password);
 
             if (result.Succeeded)
@@ -84,10 +85,12 @@ public class AccountService : IAccountService
 
     public async Task<AccountUpdateDto> GetUserByCredentialAsync(string credential)
     {
-        var user = await _userManager.FindByNameAsync(credential);
+        var normalizedCredential = credential.ToUpper();
+        
+        var user = await _userManager.FindByNameAsync(normalizedCredential);
         if (user == null)
         {
-            user = await _userManager.FindByEmailAsync(credential);
+            user = await _userManager.FindByEmailAsync(normalizedCredential);
             if (user == null) return null;
         }
 

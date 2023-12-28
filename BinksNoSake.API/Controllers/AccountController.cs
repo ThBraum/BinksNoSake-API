@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using BinksNoSake.API.Extensions;
+using BinksNoSake.API.Helpers;
 using BinksNoSake.Application.Contratos;
 using BinksNoSake.Application.Dtos;
 using Microsoft.AspNetCore.Authorization;
@@ -12,10 +13,12 @@ public class AccountController : ControllerBase
 {
     private readonly IAccountService _accountService;
     private readonly ITokenService _tokenService;
-    public AccountController(IAccountService accountService, ITokenService tokenService)
+    private readonly IUtil _util;
+    public AccountController(IAccountService accountService, ITokenService tokenService, IUtil util)
     {
         _tokenService = tokenService;
         _accountService = accountService;
+        _util = util;
     }
 
     [HttpGet("GetUser", Name = "GetUser")]
@@ -69,6 +72,7 @@ public class AccountController : ControllerBase
         try
         {
             if (await _accountService.UserExists(accountDto.Username)) return BadRequest("Username já cadastrado!");
+            if (await _accountService.GetUserByEmailAsync(accountDto.Email) != null) return BadRequest("Email já cadastrado!");
 
             var user = await _accountService.CreateAccountAsync(accountDto);
             if (user != null)
@@ -87,7 +91,7 @@ public class AccountController : ControllerBase
 
     [HttpPut("update")]
     [Authorize]
-    public async Task<IActionResult> UpdateUser([FromBody] AccountUpdateDto accountUpdateDto)
+    public async Task<IActionResult> UpdateUser([FromForm] AccountUpdateDto accountUpdateDto)
     {
         try
         {
@@ -100,9 +104,11 @@ public class AccountController : ControllerBase
             var user = await _accountService.GetUserByUsernameAsync(User.GetUserName());
             if (user == null) return Unauthorized("Usuário Inválido");
 
-            if (accountUpdateDto.ImagemURL != null)
+            var file = Request.Form.Files[0];
+            if (file.Length > 0)
             {
-                await uploadAccountImage(accountUpdateDto.ImagemURL);
+                _util.DeleteImage(user.ImagemURL, "Images");
+                accountUpdateDto.ImagemURL = await _util.SaveImage(file, "Images");
             }
 
             var userReturn = await _accountService.UpdateAccount(accountUpdateDto);
@@ -113,52 +119,6 @@ public class AccountController : ControllerBase
         catch (Exception e)
         {
             throw new Exception($"Erro ao tentar atualizar usuário: {e.Message}");
-        }
-    }
-
-    // [HttpPost("upload-image", Name = "UploadImage")]
-    // public async Task<IActionResult> UploadImage()
-    // {
-    //     try
-    //     {
-    //         var user = await _accountService.GetUserByUsernameAsync(User.GetUserName());
-    //         if (user == null) return NoContent();
-
-    //         var file = Request.Form.Files[0];
-    //         if (file.Length > 0)
-    //         {
-    //             _accountService.DeleteImage(User.GetUserId(), user.ImagemURL);
-    //             user.ImagemURL = await _accountService.SaveImage(file);
-    //         }
-
-    //         var eventoRetorno = await _accountService.UpdateAccount(user);
-    //         if (eventoRetorno == null) return BadRequest("Erro ao tentar atualizar evento");
-    //         return Ok(eventoRetorno);
-    //     }
-    //     catch (System.Exception e)
-    //     {
-    //         return this.StatusCode(StatusCodes.Status500InternalServerError, 
-    //             $"Erro ao realizar upload de imagem. Erro: {e.Message}");
-    //     }
-    // }
-
-
-    [NonAction]
-    public async Task<string> uploadAccountImage(string imageName)
-    {
-        try
-        {
-            var file = Request.Form.Files[0];
-            if (file.Length > 0)
-            {
-                _accountService.DeleteImage(User.GetUserId(), imageName);
-                imageName = await _accountService.SaveImage(file);
-            }
-            return imageName;
-        }
-        catch (System.Exception e)
-        {
-            throw new Exception(e.Message);
         }
     }
 }

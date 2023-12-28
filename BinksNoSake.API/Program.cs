@@ -13,6 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.FileProviders;
 using BinksNoSake.Application;
+using BinksNoSake.API.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,7 @@ builder.Services.AddScoped<IPirataService, PirataService>();
 builder.Services.AddScoped<ICapitaoService, CapitaoService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IUtil, Util>();
 
 builder.Services.AddScoped<ICapitaoPersist, CapitaoPersist>();
 builder.Services.AddScoped<IPirataPersist, PirataPersist>();
@@ -70,7 +72,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
             ValidateIssuer = false,
-            ValidateAudience = false
+            ValidateAudience = false,
+            ClockSkew = TimeSpan.Zero
         };
     })
     .AddGoogle(googleOptions =>
@@ -132,11 +135,11 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
+app.UseCors("CorsPolicy"); //Configuração do CORS
+
 app.UseAuthentication();
 
 app.UseAuthorization();
-
-app.UseCors("CorsPolicy"); //Configuração do CORS
 
 app.UseStaticFiles(new StaticFileOptions()
 {
