@@ -13,7 +13,7 @@ public interface IAccountService
     Task<bool> IsUsernameAvailable(string username);
     Task<SignInResult> CheckUserPasswordAsync(AccountUpdateDto accountUpdateDto, string password);
     Task<AccountDto> CreateAccountAsync(AccountDto userDto);
-    Task<AccountUpdateDto> UpdateAccount(AccountUpdateDto accountUpdateDto);
+    Task<AccountUpdateDto> UpdateAccount(AccountUpdateDto accountUpdateDto, AccountUpdateDto outdatedUser = null);
     void DeleteImage(int userId, string imageName);
     Task<string> SaveImage(IFormFile image);
 }

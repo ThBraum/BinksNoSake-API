@@ -55,6 +55,7 @@ public class AccountController : ControllerBase
                 email = user.Email,
                 imagemURL = user.ImagemURL,
                 funcao = user.Funcao,
+                phoneNumber = user.PhoneNumber,
                 refreshToken = user.RefreshToken
             });
         }
@@ -104,14 +105,18 @@ public class AccountController : ControllerBase
             var user = await _accountService.GetUserByUsernameAsync(User.GetUserName());
             if (user == null) return Unauthorized("Usuário Inválido");
 
-            var file = Request.Form.Files[0];
-            if (file.Length > 0)
+            if (Request.Form.Files.Count > 0)
             {
+                var file = Request.Form.Files[0];
                 _util.DeleteImage(user.ImagemURL, "Images");
                 accountUpdateDto.ImagemURL = await _util.SaveImage(file, "Images");
+            } 
+            else
+            {
+                accountUpdateDto.ImagemURL = user.ImagemURL;
             }
 
-            var userReturn = await _accountService.UpdateAccount(accountUpdateDto);
+            var userReturn = await _accountService.UpdateAccount(accountUpdateDto, user);
             if (userReturn == null) return NoContent();
 
             return Ok(userReturn);

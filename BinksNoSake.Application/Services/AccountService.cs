@@ -147,11 +147,11 @@ public class AccountService : IAccountService
         return imageName;
     }
 
-    public async Task<AccountUpdateDto> UpdateAccount(AccountUpdateDto accountUpdateDto)
+    public async Task<AccountUpdateDto> UpdateAccount(AccountUpdateDto accountUpdateDto, AccountUpdateDto outdatedUser)
     {
         try
         {
-            var user = await _accountPersist.GetUserByUsernameAsync(accountUpdateDto.Username);
+            var user = await _accountPersist.GetUserByUsernameAsync(outdatedUser.Username);
             if (user == null) return null;
             accountUpdateDto.Id = user.Id;
             _mapper.Map(accountUpdateDto, user);
