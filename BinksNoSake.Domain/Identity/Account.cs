@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 namespace BinksNoSake.Domain.Identity;
 public class Account : IdentityUser<int>
 {
+    public string Username { get; set; }
     public string PrimeiroNome { get; set; }
     public string UltimoNome { get; set; }
     // public string Email { get; set; }

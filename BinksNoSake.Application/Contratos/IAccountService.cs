@@ -1,4 +1,5 @@
 using BinksNoSake.Application.Dtos;
+using BinksNoSake.Domain.Identity;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;

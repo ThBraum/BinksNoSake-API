@@ -116,6 +116,17 @@ public class AccountController : ControllerBase
                 accountUpdateDto.ImagemURL = user.ImagemURL;
             }
 
+            foreach (var prop in accountUpdateDto.GetType().GetProperties())
+            {
+                var currentUserValue = prop.GetValue(user);
+                var dtoValue = prop.GetValue(accountUpdateDto);
+
+                if (dtoValue == null || string.IsNullOrEmpty(dtoValue.ToString()))
+                {
+                    prop.SetValue(accountUpdateDto, currentUserValue);
+                }
+            }
+
             var userReturn = await _accountService.UpdateAccount(accountUpdateDto, user);
             if (userReturn == null) return NoContent();
 

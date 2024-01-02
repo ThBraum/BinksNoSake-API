@@ -30,11 +30,11 @@ public class AcessoController : ControllerBase
     private readonly IUtil _util;
 
     private readonly string _destino = "Images";
-    public AcessoController(IAccountService accountService, 
-                            ITokenService tokenService, 
-                            SignInManager<Account> signInManager, 
-                            UserManager<Account> userManager, 
-                            IConfiguration configuration, 
+    public AcessoController(IAccountService accountService,
+                            ITokenService tokenService,
+                            SignInManager<Account> signInManager,
+                            UserManager<Account> userManager,
+                            IConfiguration configuration,
                             IMapper mapper,
                             IUtil util)
     {
@@ -102,7 +102,8 @@ public class AcessoController : ControllerBase
                 var nameParts = validatedToken.Name.Split(" ");
                 var primeiroNome = nameParts.Length > 0 ? nameParts[0] : null;
                 var ultimoNome = nameParts.Length > 1 ? nameParts[1] : null;
-                existingUser = new AccountUpdateDto
+
+                var accountUpdateDto = new AccountUpdateDto
                 {
                     Username = uniqueUsername,
                     Email = validatedToken.Email,
@@ -111,7 +112,9 @@ public class AcessoController : ControllerBase
                     // ImagemURL = validatedToken.Picture,
                 };
 
-                var userMapped = _mapper.Map<Account>(existingUser);
+                accountUpdateDto.Email = validatedToken.Email;
+
+                var userMapped = _mapper.Map<Account>(accountUpdateDto);
                 var result = await _userManager.CreateAsync(userMapped);
                 if (result.Succeeded)
                 {
