@@ -1,3 +1,4 @@
+using System.Globalization;
 using BinksNoSake.API.Extensions;
 using BinksNoSake.Application.Contratos;
 using BinksNoSake.Application.Dtos;
@@ -34,7 +35,7 @@ public class PirataController : ControllerBase
         }
         catch (System.Exception e)
         {
-            return this.StatusCode(StatusCodes.Status500InternalServerError, 
+            return this.StatusCode(StatusCodes.Status500InternalServerError,
             $"Erro ao tentar recuperar piratas. Erro: {e.Message}");
         }
     }
@@ -51,7 +52,7 @@ public class PirataController : ControllerBase
         }
         catch (System.Exception e)
         {
-            return this.StatusCode(StatusCodes.Status500InternalServerError, 
+            return this.StatusCode(StatusCodes.Status500InternalServerError,
             $"Erro ao tentar recuperar pirata. Erro: {e.Message}");
         }
     }
@@ -62,14 +63,14 @@ public class PirataController : ControllerBase
     public async Task<IActionResult> Post(PirataDto model)
     {
         try
-        {   
+        {
             var pirata = await _pirataService.AddPirata(model);
             if (pirata == null) return BadRequest("Erro ao tentar adicionar pirata.");
             return Ok(pirata);
         }
         catch (System.Exception e)
         {
-            return this.StatusCode(StatusCodes.Status500InternalServerError, 
+            return this.StatusCode(StatusCodes.Status500InternalServerError,
             $"Erro ao tentar adicionar pirata. Erro: {e.Message}");
         }
     }
@@ -86,7 +87,7 @@ public class PirataController : ControllerBase
         }
         catch (System.Exception e)
         {
-            return this.StatusCode(StatusCodes.Status500InternalServerError, 
+            return this.StatusCode(StatusCodes.Status500InternalServerError,
             $"Erro ao tentar atualizar pirata. Erro: {e.Message}");
         }
     }
@@ -97,13 +98,13 @@ public class PirataController : ControllerBase
     {
         try
         {
-            return await _pirataService.DeletePirata(id) ? 
-            Ok("Deletado") : 
+            return await _pirataService.DeletePirata(id) ?
+            Ok("Deletado") :
             BadRequest("Pirata não deletado");
         }
         catch (System.Exception e)
         {
-            return this.StatusCode(StatusCodes.Status500InternalServerError, 
+            return this.StatusCode(StatusCodes.Status500InternalServerError,
             $"Erro ao tentar deletar pirata. Erro: {e.Message}");
         }
     }

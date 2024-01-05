@@ -1,3 +1,4 @@
+using System.Globalization;
 using AutoMapper;
 using BinksNoSake.Application.Contratos;
 using BinksNoSake.Application.Dtos;
@@ -169,6 +170,5 @@ public class PirataService : IPirataService
         }
         return capitao;
     }
-
 
 }
