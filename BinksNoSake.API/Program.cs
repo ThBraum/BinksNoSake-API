@@ -16,17 +16,11 @@ using BinksNoSake.Application;
 using BinksNoSake.API.Helpers;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-builder.Services.Configure<RequestLocalizationOptions>(options => 
-{
-    options.DefaultRequestCulture = new RequestCulture("pt-BR");
-    options.SupportedCultures = new List<CultureInfo> { new CultureInfo("pt-BR") };
-    options.SupportedUICultures = new List<CultureInfo> { new CultureInfo("pt-BR") };
-});
 
 builder.Services.AddScoped<IPirataService, PirataService>();
 builder.Services.AddScoped<ICapitaoService, CapitaoService>();
@@ -89,6 +83,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
         googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+        googleOptions.Scope.Add("email");
+        googleOptions.Scope.Add("profile");
     });
 
 
@@ -96,10 +92,7 @@ builder.Services.AddControllers().
 AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-    options.JsonSerializerOptions.PropertyNamingPolicy = null;
-    options.JsonSerializerOptions.WriteIndented = true;
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); //Converte os enums para string
-    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     options.JsonSerializerOptions.Converters.Add(new DateTimeConverter()); // Adiciona o novo conversor
 });
 // AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
