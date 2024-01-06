@@ -1,5 +1,6 @@
 using System.Globalization;
 using BinksNoSake.API.Extensions;
+using BinksNoSake.API.Helpers;
 using BinksNoSake.Application.Contratos;
 using BinksNoSake.Application.Dtos;
 using BinksNoSake.Persistence.Pagination;
@@ -14,10 +15,13 @@ namespace BinksNoSake.API.Controllers;
 public class PirataController : ControllerBase
 {
     private readonly IPirataService _pirataService;
-    public PirataController(IPirataService pirataService)
+    private readonly IUtil _util;
+
+    private readonly string _destino = "Images";
+    public PirataController(IPirataService pirataService, IUtil util)
     {
         _pirataService = pirataService;
-
+        _util = util;
     }
 
     [HttpGet(Name = "GetAllPiratas")]
@@ -60,10 +64,16 @@ public class PirataController : ControllerBase
 
     [HttpPost(Name = "AddPirata")]
     [Authorize]
-    public async Task<IActionResult> Post(PirataDto model)
+    public async Task<IActionResult> Post([FromForm] PirataDto model)
     {
         try
         {
+            if (Request.Form.Files.Count > 0)
+            {
+                var file = Request.Form.Files[0];
+                model.ImagemURL = await _util.SaveImage(file, _destino);
+            }
+
             var pirata = await _pirataService.AddPirata(model);
             if (pirata == null) return BadRequest("Erro ao tentar adicionar pirata.");
             return Ok(pirata);

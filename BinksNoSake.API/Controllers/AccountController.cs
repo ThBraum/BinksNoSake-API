@@ -14,6 +14,8 @@ public class AccountController : ControllerBase
     private readonly IAccountService _accountService;
     private readonly ITokenService _tokenService;
     private readonly IUtil _util;
+
+    private readonly string _destino = "Images";
     public AccountController(IAccountService accountService, ITokenService tokenService, IUtil util)
     {
         _tokenService = tokenService;
@@ -108,14 +110,15 @@ public class AccountController : ControllerBase
             if (Request.Form.Files.Count > 0)
             {
                 var file = Request.Form.Files[0];
-                _util.DeleteImage(user.ImagemURL, "Images");
-                accountUpdateDto.ImagemURL = await _util.SaveImage(file, "Images");
+                _util.DeleteImage(user.ImagemURL, _destino);
+                accountUpdateDto.ImagemURL = await _util.SaveImage(file, _destino);
             } 
             else
             {
                 accountUpdateDto.ImagemURL = user.ImagemURL;
             }
 
+            // Percorre todas as propriedades do DTO para verificar se alguma está nula ou vazia. Se estiver, atribui o valor da propriedade do usuário atual.
             foreach (var prop in accountUpdateDto.GetType().GetProperties())
             {
                 var currentUserValue = prop.GetValue(user);

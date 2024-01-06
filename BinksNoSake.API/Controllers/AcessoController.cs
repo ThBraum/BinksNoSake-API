@@ -28,8 +28,6 @@ public class AcessoController : ControllerBase
     private readonly IConfiguration _configuration;
     private readonly IMapper _mapper;
     private readonly IUtil _util;
-
-    private readonly string _destino = "Images";
     public AcessoController(IAccountService accountService,
                             ITokenService tokenService,
                             SignInManager<Account> signInManager,
@@ -71,7 +69,7 @@ public class AcessoController : ControllerBase
                     imagemURL = user.ImagemURL,
                     funcao = user.Funcao,
                     token = user.Token,
-                    refreshToken = user.RefreshToken
+                    refreshToken = user.RefreshToken,
                 });
             }
             return Unauthorized("Usuário e/ou Senha incorreto(s)");
@@ -109,7 +107,7 @@ public class AcessoController : ControllerBase
                     Email = validatedToken.Email,
                     PrimeiroNome = validatedToken.GivenName ?? primeiroNome ?? null,
                     UltimoNome = validatedToken.Family_name ?? ultimoNome ?? null,
-                    // ImagemURL = validatedToken.Picture,
+                    ImagemURL = validatedToken.Picture ?? null,
                 };
 
                 accountUpdateDto.Email = validatedToken.Email;
@@ -140,10 +138,10 @@ public class AcessoController : ControllerBase
                 primeiroNome = existingUser.PrimeiroNome,
                 ultimoNome = existingUser.UltimoNome,
                 email = existingUser.Email,
-                imagemURL = existingUser.ImagemURL,
+                imagemURL = existingUser?.ImagemURL,
                 funcao = existingUser.Funcao,
                 token = existingUser.Token,
-                refreshToken = existingUser.RefreshToken
+                refreshToken = existingUser.RefreshToken,
             });
         }
         catch (System.Exception e)

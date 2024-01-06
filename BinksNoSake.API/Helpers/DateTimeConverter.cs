@@ -13,7 +13,7 @@ public class DateTimeConverter : JsonConverter<DateTime>
     {
         if (reader.TokenType == JsonTokenType.String)
         {
-            if (DateTime.TryParseExact(reader.GetString(), "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var result))
+            if (DateTime.TryParseExact(reader.GetString(), "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var result))
             {
                 return result;
             }
