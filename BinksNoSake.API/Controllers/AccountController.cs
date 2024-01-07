@@ -52,8 +52,8 @@ public class AccountController : ControllerBase
             {
                 id = user.Id,
                 username = user.Username,
-                primeiroNome = user.PrimeiroNome,
-                ultimoNome = user.UltimoNome,
+                nome = user.Nome,
+                sobrenome = user.Sobrenome,
                 email = user.Email,
                 imagemURL = user.ImagemURL,
                 funcao = user.Funcao,
@@ -70,18 +70,31 @@ public class AccountController : ControllerBase
 
     [HttpPost("register")]
     [AllowAnonymous]
-    public async Task<IActionResult> Register([FromBody] AccountDto accountDto)
+    public async Task<IActionResult> Register([FromForm] AccountDto accountDto)
     {
         try
         {
-            if (await _accountService.UserExists(accountDto.Username)) return BadRequest("Username já cadastrado!");
-            if (await _accountService.GetUserByEmailAsync(accountDto.Email) != null) return BadRequest("Email já cadastrado!");
+            if (await _accountService.UserExists(accountDto.Username)) return Conflict("Username já cadastrado!");
+            if (await _accountService.GetUserByEmailAsync(accountDto.Email) != null) return Conflict("Email já cadastrado!");
 
+            if (Request.Form.Files.Count > 0)
+            {
+                var file = Request.Form.Files[0];
+                accountDto.ImagemURL = await _util.SaveImage(file, _destino);
+            }
+            
             var user = await _accountService.CreateAccountAsync(accountDto);
             if (user != null)
             {
                 var userToReturn = _accountService.GetUserByUsernameAsync(accountDto.Username);
-                return Created("", userToReturn);
+                var token = await _tokenService.CreateToken(userToReturn.Result);
+
+                var response = new
+                {
+                    user = userToReturn,
+                    Token = token
+                };
+                return Created("", response);
             }
             return BadRequest("Erro ao tentar adicionar usuário!");
         }

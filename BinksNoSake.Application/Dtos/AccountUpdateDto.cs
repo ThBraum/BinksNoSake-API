@@ -10,8 +10,8 @@ public class AccountUpdateDto
     public int? Id { get; set; }
     public string?  Username { get; set; }
     public string? Email { get; set; }
-    public string? PrimeiroNome { get; set; }
-    public string? UltimoNome { get; set; }
+    public string? Nome { get; set; }
+    public string? Sobrenome { get; set; }
     public string? PhoneNumber { get; set; }
     public string? ImagemURL { get; set; }
     public string? Funcao { get; set; }

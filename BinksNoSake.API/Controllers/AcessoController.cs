@@ -63,8 +63,8 @@ public class AcessoController : ControllerBase
                 return Ok(new
                 {
                     username = user.Username,
-                    primeiroNome = user.PrimeiroNome,
-                    ultimoNome = user.UltimoNome,
+                    nome = user.Nome,
+                    sobrenome = user.Sobrenome,
                     email = user.Email,
                     imagemURL = user.ImagemURL,
                     funcao = user.Funcao,
@@ -98,15 +98,15 @@ public class AcessoController : ControllerBase
                 var uniqueUsername = await GenerateUniqueUsername(generatedUsername);
 
                 var nameParts = validatedToken.Name.Split(" ");
-                var primeiroNome = nameParts.Length > 0 ? nameParts[0] : null;
-                var ultimoNome = nameParts.Length > 1 ? nameParts[1] : null;
+                var nome = nameParts.Length > 0 ? nameParts[0] : null;
+                var sobrenome = nameParts.Length > 1 ? nameParts[1] : null;
 
                 var accountUpdateDto = new AccountUpdateDto
                 {
                     Username = uniqueUsername,
                     Email = validatedToken.Email,
-                    PrimeiroNome = validatedToken.GivenName ?? primeiroNome ?? null,
-                    UltimoNome = validatedToken.Family_name ?? ultimoNome ?? null,
+                    Nome = validatedToken.GivenName ?? nome ?? null,
+                    Sobrenome = validatedToken.Family_name ?? sobrenome ?? null,
                     ImagemURL = validatedToken.Picture ?? null,
                 };
 
@@ -135,8 +135,8 @@ public class AcessoController : ControllerBase
             return Ok(new
             {
                 username = existingUser.Username,
-                primeiroNome = existingUser.PrimeiroNome,
-                ultimoNome = existingUser.UltimoNome,
+                nome = existingUser.Nome,
+                sobrenome = existingUser.Sobrenome,
                 email = existingUser.Email,
                 imagemURL = existingUser?.ImagemURL,
                 funcao = existingUser.Funcao,
