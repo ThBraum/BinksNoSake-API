@@ -34,7 +34,7 @@ public class CapitaoService : ICapitaoService
                 _geralPersist.Detach(pirata);
             }
             capitao.Piratas.Clear();
-            await _capitaoPersist.AddCapitaoWithExistingPiratasAsync(capitao, model.Piratas.Select(p => p.Id).ToList());
+            await _capitaoPersist.AddCapitaoWithPiratasAsync(capitao, model.Piratas.Select(p => _mapper.Map<PirataModel>(p)).ToList());
             if (await _geralPersist.SaveChangesAsync())
             {
                 capitao = await _capitaoPersist.GetCapitaoByIdAsync(capitao.Id);
@@ -47,6 +47,7 @@ public class CapitaoService : ICapitaoService
             throw new Exception(e.Message);
         }
     }
+
 
     public async Task<bool> DeleteCapitao(int capitaoId)
     {
