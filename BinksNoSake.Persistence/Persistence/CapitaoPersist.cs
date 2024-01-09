@@ -13,6 +13,23 @@ public class CapitaoPersist : ICapitaoPersist
         _context = context;
     }
 
+    public async Task<CapitaoModel> AddCapitaoWithExistingPiratasAsync(CapitaoModel capitao, List<int> pirataIds)
+    {
+        var piratasExistente = await _context.Piratas
+            .Include(p => p.Capitao)
+            .Where(p => pirataIds.Contains(p.Id))
+            .ToListAsync();
+
+        foreach (var pirataExistente in piratasExistente)
+        {
+            pirataExistente.Capitao = capitao;
+            capitao.Piratas.Add(pirataExistente);
+        }
+
+        _context.Capitaes.Add(capitao);
+
+        return capitao;
+    }
     public async Task<PageList<CapitaoModel>> GetAllCapitaesAsync(PageParams pageParams)
     {
         IQueryable<CapitaoModel> query = _context.Capitaes.AsNoTracking()

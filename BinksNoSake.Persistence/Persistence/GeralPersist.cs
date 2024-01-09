@@ -32,9 +32,12 @@ public class GeralPersist : IGeralPersist
         _context.Update(entity);
     }
 
-    public async void Detach<T>(T entity) where T : class
+    public void Detach<T>(T entity) where T : class
     {
-        _context.Entry(entity).State = EntityState.Detached;
+        if (_context.Entry(entity).State != EntityState.Detached)
+        {
+            _context.Entry(entity).State = EntityState.Detached;
+        }
     }
 
     public async Task<bool> SaveChangesAsync()

@@ -4,6 +4,7 @@ using BinksNoSake.Application.Dtos;
 using BinksNoSake.Domain.Models;
 using BinksNoSake.Persistence.Contratos;
 using BinksNoSake.Persistence.Pagination;
+using Microsoft.EntityFrameworkCore;
 
 namespace BinksNoSake.Application.Services;
 public class CapitaoService : ICapitaoService
@@ -11,12 +12,14 @@ public class CapitaoService : ICapitaoService
     private readonly IGeralPersist _geralPersist;
     private readonly ICapitaoPersist _capitaoPersist;
     private readonly IMapper _mapper;
+    private readonly IPirataPersist _pirataPersist;
 
-    public CapitaoService(IGeralPersist geralPersist, ICapitaoPersist capitaoPersist, IMapper mapper)
+    public CapitaoService(IGeralPersist geralPersist, ICapitaoPersist capitaoPersist, IMapper mapper, IPirataPersist pirataPersist)
     {
         _mapper = mapper;
         _capitaoPersist = capitaoPersist;
         _geralPersist = geralPersist;
+        _pirataPersist = pirataPersist;
     }
 
     public async Task<CapitaoDto> AddCapitao(CapitaoDto model)
@@ -24,17 +27,23 @@ public class CapitaoService : ICapitaoService
         try
         {
             var capitao = _mapper.Map<CapitaoModel>(model);
-            _geralPersist.Add<CapitaoModel>(capitao);
+
+            _geralPersist.Detach(capitao);
+            foreach (var pirata in capitao.Piratas)
+            {
+                _geralPersist.Detach(pirata);
+            }
+            capitao.Piratas.Clear();
+            await _capitaoPersist.AddCapitaoWithExistingPiratasAsync(capitao, model.Piratas.Select(p => p.Id).ToList());
             if (await _geralPersist.SaveChangesAsync())
             {
-                var capitaoRetorno = await _capitaoPersist.GetCapitaoByIdAsync(capitao.Id);
-                return _mapper.Map<CapitaoDto>(capitaoRetorno);
+                capitao = await _capitaoPersist.GetCapitaoByIdAsync(capitao.Id);
+                return _mapper.Map<CapitaoDto>(capitao);
             }
             return null;
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
-            
             throw new Exception(e.Message);
         }
     }

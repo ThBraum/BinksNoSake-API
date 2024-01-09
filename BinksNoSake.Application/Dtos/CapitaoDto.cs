@@ -8,9 +8,9 @@ public class CapitaoDto
     [Key]
     public int Id { get; set; }
     public string? Nome { get; set; }
-
+    public string? ImagemURL { get; set; }
     // Relação com Piratas
-    public IEnumerable<PirataDto>? Piratas { get; set; }
+    public List<PirataDto>? Piratas { get; set; }
 
     // Relação com Timoneiro
     public int? TimoneiroId { get; set; }

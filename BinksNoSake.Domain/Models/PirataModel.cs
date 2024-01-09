@@ -16,5 +16,5 @@ public class PirataModel
     public CapitaoModel? Capitao { get; set; }
 
     // Relação com Navios
-    public IEnumerable<NavioModel>? Navios { get; set; }
+    public List<NavioModel>? Navios { get; set; }
 }
