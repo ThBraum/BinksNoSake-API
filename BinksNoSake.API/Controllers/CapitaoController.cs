@@ -1,4 +1,5 @@
 using BinksNoSake.API.Extensions;
+using BinksNoSake.API.Helpers;
 using BinksNoSake.Application.Contratos;
 using BinksNoSake.Application.Dtos;
 using BinksNoSake.Persistence.Pagination;
@@ -12,11 +13,12 @@ namespace BinksNoSake.API.Controllers;
 public class CapitaoController : ControllerBase
 {
     private readonly ICapitaoService _capitaoService;
+    private readonly IUtil _uti;
 
-    public CapitaoController(ICapitaoService capitaoService)
+    public CapitaoController(ICapitaoService capitaoService, IUtil util)
     {
         _capitaoService = capitaoService;
-
+        _uti = util;
     }
 
     [HttpGet(Name = "GetAllCapitaes")]
@@ -57,10 +59,16 @@ public class CapitaoController : ControllerBase
 
     [HttpPost(Name = "AddCapitao")]
     [Authorize]
-    public async Task<IActionResult> Post(CapitaoDto model)
+    public async Task<IActionResult> Post([FromForm] CapitaoDto model)
     {
         try
         {
+            if (Request.Form.Files.Count > 0)
+            {
+                var file = Request.Form.Files[0];
+                model.ImagemURL = await _uti.SaveImage(file);
+            }
+
             var capitao = await _capitaoService.AddCapitao(model);
             if (capitao == null) return BadRequest("Erro ao tentar adicionar capitao.");
             return Ok(capitao);
