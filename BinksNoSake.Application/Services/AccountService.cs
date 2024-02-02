@@ -1,3 +1,5 @@
+using System.Text;
+using System.Text.RegularExpressions;
 using AutoMapper;
 using BinksNoSake.Application.Contratos;
 using BinksNoSake.Application.Dtos;
@@ -7,6 +9,7 @@ using Google.Apis.Auth;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace BinksNoSake.Application.Services;
@@ -86,7 +89,7 @@ public class AccountService : IAccountService
     public async Task<AccountUpdateDto> GetUserByCredentialAsync(string credential)
     {
         var normalizedCredential = credential.ToUpper();
-        
+
         var user = await _userManager.FindByNameAsync(normalizedCredential);
         if (user == null)
         {
@@ -132,6 +135,15 @@ public class AccountService : IAccountService
         return existingUser.Result == null ? Task.FromResult(true) : Task.FromResult(false);
     }
 
+    public async Task<string> RemoveAccents(string input)
+    {
+        if (string.IsNullOrEmpty(input)) return input;
+
+        string normalizedString = input.Normalize(NormalizationForm.FormD);
+        Regex regex = new Regex("[^a-zA-Z0-9 ]");
+        return regex.Replace(normalizedString, "");
+    }
+
     public async Task<string> SaveImage(IFormFile image)
     {
         string imageName = new String(Path.GetFileNameWithoutExtension(image.FileName)
@@ -161,7 +173,7 @@ public class AccountService : IAccountService
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
                 var result = await _userManager.ResetPasswordAsync(user, token, accountUpdateDto.Password);
             }
-            _accountPersist.Update<Account>(user); 
+            _accountPersist.Update<Account>(user);
 
             if (await _accountPersist.SaveChangesAsync())
             {
@@ -181,12 +193,58 @@ public class AccountService : IAccountService
     {
         try
         {
-            return await _userManager.FindByNameAsync(username.ToLower()) != null;
+            var normalizedUsername = await RemoveAccents(username);
+
+            var existingUser = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == normalizedUsername);
+            if (existingUser != null)
+            {
+                return true;
+            }
+
+            return await _userManager.Users.AnyAsync(u => u.UserName == username);
         }
         catch (System.Exception e)
         {
-
             throw new Exception($"Erro ao verificar usuário. {e.Message}");
+        }
+    }
+
+    public async Task<string> GenerateUniqueUsername(AccountDto accountDto)
+    {
+        accountDto.Username = accountDto.Username.Replace(" ", "");
+        var baseUsername = await RemoveAccents(accountDto.Username);
+        var username = baseUsername;
+        var suffix = 1;
+        while (await UserExists(username))
+        {
+            username = $"{baseUsername}{suffix}";
+            suffix++;
+        }
+
+        return username;
+    }
+
+    private static string NormalizeUsername(string username)
+    {
+        return username.ToLower();
+    }
+
+    public bool DeleteAccountAsync(int id)
+    {
+        try
+        {
+            var user = _accountPersist.GetUserByIdAsync(id);
+            if (user.Result == null) return false;
+            _accountPersist.Delete<Account>(user.Result);
+            if (_accountPersist.SaveChangesAsync().Result)
+            {
+                return true;
+            }
+            return false;
+        }
+        catch (System.Exception e)
+        {
+            throw new Exception($"Erro ao deletar usuário. {e.Message}");
         }
     }
 }

@@ -189,6 +189,7 @@ public class AcessoController : ControllerBase
     private async Task<string> GenerateUniqueUsername(string baseUsername)
     {
         string generatedUsername = baseUsername;
+        generatedUsername = await _accountService.RemoveAccents(generatedUsername);
 
         while (await _accountService.UserExists(generatedUsername))
         {

@@ -82,6 +82,8 @@ public class AccountController : ControllerBase
                 var file = Request.Form.Files[0];
                 accountDto.ImagemURL = await _util.SaveImage(file, _destino);
             }
+
+            accountDto.Username = await _accountService.GenerateUniqueUsername(accountDto);
             
             var user = await _accountService.CreateAccountAsync(accountDto);
             if (user != null)
@@ -151,6 +153,27 @@ public class AccountController : ControllerBase
         catch (Exception e)
         {
             throw new Exception($"Erro ao tentar atualizar usuário: {e.Message}");
+        }
+    }
+
+    [HttpDelete("deleteAccount")]
+    [Authorize]
+    public async Task<IActionResult> DeleteAccount()
+    {
+        try
+        {
+            var username = User.GetUserName();
+            var user = await _accountService.GetUserByUsernameAsync(username);
+            if (user == null) return NoContent();
+
+            var result = _accountService.DeleteAccountAsync(user.Id.Value);
+            if (result) return Ok("Usuário deletado com sucesso!");
+
+            return BadRequest("Erro ao tentar deletar usuário!");
+        }
+        catch (System.Exception e)
+        {
+            throw new Exception($"Erro ao tentar deletar usuário: {e.Message}");
         }
     }
 }

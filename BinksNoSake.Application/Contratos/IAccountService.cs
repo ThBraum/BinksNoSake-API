@@ -17,4 +17,7 @@ public interface IAccountService
     Task<AccountUpdateDto> UpdateAccount(AccountUpdateDto accountUpdateDto, AccountUpdateDto outdatedUser = null);
     void DeleteImage(int userId, string imageName);
     Task<string> SaveImage(IFormFile image);
+    Task<string> GenerateUniqueUsername(AccountDto accountDto);
+    Task<string> RemoveAccents(string input);
+    bool DeleteAccountAsync(int id);
 }
