@@ -4,7 +4,7 @@
 
 ***
 <p align="center">
-  <img src="https://github.com/ThBraum/BinksNoSake/assets/85642694/37cf8e7f-ec16-4899-9183-2ab8534f43cf"/>
+  <img src="https://github.com/ThBraum/BinksNoSake/assets/85642694/899b90c6-1d27-4a94-8be9-2b20a68c4a42"/>
 </p>
 
 ## Getting Started
