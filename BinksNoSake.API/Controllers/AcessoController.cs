@@ -45,6 +45,14 @@ public class AcessoController : ControllerBase
         _util = util;
     }
 
+    /// <summary>
+    /// Autentica um usuário com base no nome de usuário ou email e senha fornecidos.
+    /// </summary>
+    /// <param name="accountLoginDto">DTO contendo o nome de usuário e senha para login.</param>
+    /// <returns>Um objeto contendo informações do usuário autenticado e tokens de acesso e refresh.</returns>
+    /// <response code="200">Login bem-sucedido. Retorna os detalhes do usuário e tokens.</response>
+    /// <response code="401">Credenciais inválidas.</response>
+    /// <response code="404">Usuário não encontrado.</response>
     [HttpPost("login")]
     [AllowAnonymous]
     public async Task<IActionResult> Login([FromBody] AccountLoginDto accountLoginDto)
@@ -81,6 +89,13 @@ public class AcessoController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Autentica ou registra um usuário através de um token do Firebase obtido pelo login com Google.
+    /// </summary>
+    /// <param name="request">DTO contendo o token do Firebase.</param>
+    /// <returns>Um objeto contendo informações do usuário autenticado e tokens de acesso e refresh.</returns>
+    /// <response code="200">Usuário autenticado ou registrado com sucesso. Retorna os detalhes do usuário e tokens.</response>
+    /// <response code="400">Erro ao processar o pedido de login ou registro.</response>
     [HttpPost("LoginWithGoogle")]
     [AllowAnonymous]
     public async Task<IActionResult> ExchangeFirebaseToken([FromBody] FirebaseTokenRequest request)
@@ -199,6 +214,13 @@ public class AcessoController : ControllerBase
         return generatedUsername;
     }
 
+    /// <summary>
+    /// Atualiza o token de acesso de um usuário com base no seu token de refresh.
+    /// Requer autenticação.
+    /// </summary>
+    /// <returns>Um novo token de acesso e token de refresh.</returns>
+    /// <response code="200">Tokens atualizados com sucesso.</response>
+    /// <response code="401">Token de refresh inválido ou expirado.</response>
     [HttpPost("refreshToken")]
     [Authorize]
     public async Task<IActionResult> RefreshToken()

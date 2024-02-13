@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BinksNoSake.API.Controllers;
 
+/// <summary>
+/// Controlador responsável pelo gerenciamento de capitães.
+/// </summary>
 [ApiController]
 [Route("[controller]")]
 public class CapitaoController : ControllerBase
@@ -21,6 +24,13 @@ public class CapitaoController : ControllerBase
         _uti = util;
     }
 
+    /// <summary>
+    /// Retorna uma lista paginada de capitães.
+    /// </summary>
+    /// <param name="pageParams">Parâmetros de paginação.</param>
+    /// <returns>Uma lista paginada de capitães.</returns>
+    /// <response code="200">Retorna a lista paginada de capitães.</response>
+    /// <response code="204">Retorna se não houver capitães.</response>
     [HttpGet(Name = "GetAllCapitaes")]
     [AllowAnonymous]
     public async Task<IActionResult> Get([FromQuery] PageParams pageParams)
@@ -29,9 +39,9 @@ public class CapitaoController : ControllerBase
         {
             var capitaes = await _capitaoService.GetAllCapitaesAsync(pageParams);
             if (capitaes == null) return NoContent();
-            
+
             Response.AddPagination(capitaes.CurrentPage, capitaes.PageSize, capitaes.TotalCount, capitaes.TotalPages);
-            
+
             return Ok(capitaes);
         }
         catch (System.Exception e)
@@ -40,6 +50,13 @@ public class CapitaoController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Retorna os detalhes de um capitão específico pelo ID.
+    /// </summary>
+    /// <param name="id">O ID do capitão.</param>
+    /// <returns>Detalhes do capitão.</returns>
+    /// <response code="200">Retorna os detalhes do capitão.</response>
+    /// <response code="204">Retorna se o capitão não for encontrado.</response>
     [HttpGet("{id}", Name = "GetCapitaoById")]
     [AllowAnonymous]
     public async Task<IActionResult> Get(int id)
@@ -57,6 +74,14 @@ public class CapitaoController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Adiciona um novo capitão ao sistema.
+    /// Requer autenticação.
+    /// </summary>
+    /// <param name="model">Dados do capitão para adicionar.</param>
+    /// <returns>Os detalhes do capitão adicionado.</returns>
+    /// <response code="200">Retorna os detalhes do capitão adicionado.</response>
+    /// <response code="400">Retorna se houver um erro ao adicionar o capitão.</response>
     [HttpPost(Name = "AddCapitao")]
     [Authorize]
     public async Task<IActionResult> Post([FromForm] CapitaoDto model)
@@ -80,6 +105,15 @@ public class CapitaoController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Atualiza os detalhes de um capitão existente.
+    /// Requer autenticação.
+    /// </summary>
+    /// <param name="id">O ID do capitão a ser atualizado.</param>
+    /// <param name="model">Os novos dados do capitão.</param>
+    /// <returns>Os detalhes do capitão atualizado.</returns>
+    /// <response code="200">Retorna os detalhes do capitão atualizado.</response>
+    /// <response code="400">Retorna se houver um erro ao atualizar o capitão.</response>
     [HttpPut("{id}", Name = "UpdateCapitao")]
     [Authorize]
     public async Task<IActionResult> Put(int id, CapitaoDto model)
@@ -97,6 +131,14 @@ public class CapitaoController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Deleta um capitão do sistema.
+    /// Requer autenticação.
+    /// </summary>
+    /// <param name="id">O ID do capitão a ser deletado.</param>
+    /// <returns>Uma mensagem indicando sucesso.</returns>
+    /// <response code="200">Retorna se o capitão foi deletado com sucesso.</response>
+    /// <response code="400">Retorna se houver um erro ao tentar deletar o capitão.</response>
     [HttpDelete("{id}", Name = "DeleteCapitao")]
     [Authorize]
     public async Task<IActionResult> Delete(int id)

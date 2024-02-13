@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BinksNoSake.API.Controllers;
+/// <summary>
+/// Controller para operações de conta.
+/// </summary>
 [ApiController]
 [Route("[controller]")]
 public class AccountController : ControllerBase
@@ -23,6 +26,13 @@ public class AccountController : ControllerBase
         _util = util;
     }
 
+    /// <summary>
+    /// Obtém informações do usuário autenticado, incluindo tokens de acesso e refresh atualizados se necessário.
+    /// Requer autenticação.
+    /// </summary>
+    /// <returns>Um objeto contendo informações detalhadas do usuário, incluindo tokens de acesso e refresh.</returns>
+    /// <response code="200">Retorna as informações do usuário autenticado.</response>
+    /// <response code="204">Retorna quando o usuário não é encontrado.</response>
     [HttpGet("GetUser", Name = "GetUser")]
     [Authorize]
     public async Task<IActionResult> GetUser()
@@ -67,7 +77,14 @@ public class AccountController : ControllerBase
         }
     }
 
-
+    /// <summary>
+    /// Registra um novo usuário no sistema.
+    /// </summary>
+    /// <param name="accountDto">Dados do usuário para registro, incluindo nome de usuário, e-mail, senha, nome, sobrenome e opcionalmente uma URL de imagem.</param>
+    /// <returns>Detalhes do usuário recém-criado, incluindo token de acesso.</returns>
+    /// <response code="201">Retorna os detalhes do usuário recém-criado e um token de acesso.</response>
+    /// <response code="400">Retorna se ocorreu um erro ao tentar adicionar o usuário.</response>
+    /// <response code="409">Retorna se o nome de usuário ou e-mail já estiverem em uso.</response>
     [HttpPost("register")]
     [AllowAnonymous]
     public async Task<IActionResult> Register([FromForm] AccountDto accountDto)
@@ -84,7 +101,7 @@ public class AccountController : ControllerBase
             }
 
             accountDto.Username = await _accountService.GenerateUniqueUsername(accountDto);
-            
+
             var user = await _accountService.CreateAccountAsync(accountDto);
             if (user != null)
             {
@@ -107,6 +124,16 @@ public class AccountController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Atualiza os detalhes de um usuário existente.
+    /// Requer autenticação.
+    /// </summary>
+    /// <param name="accountUpdateDto">Dados atualizados do usuário. Todos os campos são opcionais.</param>
+    /// <returns>Detalhes atualizados do usuário.</returns>
+    /// <response code="200">Retorna os detalhes atualizados do usuário.</response>
+    /// <response code="204">Retorna se não há conteúdo para atualizar.</response>
+    /// <response code="401">Retorna se o usuário não está autenticado ou é inválido.</response>
+    /// <response code="409">Retorna se o nome de usuário escolhido não está disponível.</response>
     [HttpPut("update")]
     [Authorize]
     public async Task<IActionResult> UpdateUser([FromForm] AccountUpdateDto accountUpdateDto)
@@ -127,7 +154,7 @@ public class AccountController : ControllerBase
                 var file = Request.Form.Files[0];
                 _util.DeleteImage(user.ImagemURL, _destino);
                 accountUpdateDto.ImagemURL = await _util.SaveImage(file, _destino);
-            } 
+            }
             else
             {
                 accountUpdateDto.ImagemURL = user.ImagemURL;
@@ -156,6 +183,13 @@ public class AccountController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Deleta a conta do usuário autenticado.
+    /// Requer autenticação.
+    /// </summary>
+    /// <response code="200">Retorna se o usuário foi deletado com sucesso.</response>
+    /// <response code="400">Retorna se ocorreu um erro ao tentar deletar o usuário.</response>
+    /// <response code="204">Retorna se o usuário a ser deletado não foi encontrado.</response>
     [HttpDelete("deleteAccount")]
     [Authorize]
     public async Task<IActionResult> DeleteAccount()

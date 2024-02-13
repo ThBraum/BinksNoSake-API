@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using BinksNoSake.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using BinksNoSake.Application.Contratos;
@@ -17,6 +18,8 @@ using BinksNoSake.API.Helpers;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -101,7 +104,18 @@ AddJsonOptions(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "BinksNoSake.API", Version = "v1" });
+    options.SwaggerDoc("v1", new OpenApiInfo 
+    { 
+        Title = "BinksNoSake.API", 
+        Version = "v1", 
+        Description = "API do Projeto BinksNoSake",
+        Contact = new OpenApiContact
+        {
+            Name = "Matheus Thomaz Braum",
+            Email = "matgheus_braum1@hotmail.com",
+            Url = new Uri("https://www.linkedin.com/in/matheus-thomaz-braum-5562b417a/")
+        }
+    });
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header. Insira seu token.",
@@ -128,6 +142,10 @@ builder.Services.AddSwaggerGen(options =>
             new List<string>()
         }
     });
+
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(xmlPath);
 });
 
 var app = builder.Build();

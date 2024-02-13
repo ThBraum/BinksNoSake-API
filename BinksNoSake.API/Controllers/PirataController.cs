@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BinksNoSake.API.Controllers;
 
+/// <summary>
+/// Controlador responsável pela gestão de piratas.
+/// </summary>
 [ApiController]
 [Route("[controller]")]
 public class PirataController : ControllerBase
@@ -24,6 +27,13 @@ public class PirataController : ControllerBase
         _util = util;
     }
 
+    /// <summary>
+    /// Retorna uma lista paginada de piratas.
+    /// </summary>
+    /// <param name="pageParams">Parâmetros de paginação para controlar o tamanho da página e o número da página.</param>
+    /// <returns>Uma lista paginada de piratas.</returns>
+    /// <response code="200">Retorna a lista paginada de piratas.</response>
+    /// <response code="204">Retorna se não houver piratas.</response>
     [HttpGet(Name = "GetAllPiratas")]
     [AllowAnonymous]
     public async Task<IActionResult> Get([FromQuery] PageParams pageParams)
@@ -44,6 +54,13 @@ public class PirataController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Retorna os detalhes de um pirata específico pelo ID.
+    /// </summary>
+    /// <param name="id">O ID do pirata a ser recuperado.</param>
+    /// <returns>Detalhes do pirata solicitado.</returns>
+    /// <response code="200">Retorna os detalhes do pirata.</response>
+    /// <response code="204">Retorna se o pirata não for encontrado.</response>
     [HttpGet("{id}", Name = "GetPirataById")]
     [AllowAnonymous]
     public async Task<IActionResult> Get(int id)
@@ -62,6 +79,14 @@ public class PirataController : ControllerBase
     }
 
 
+    /// <summary>
+    /// Adiciona um novo pirata ao sistema.
+    /// Requer autenticação.
+    /// </summary>
+    /// <param name="model">Dados do pirata para adicionar.</param>
+    /// <returns>Os detalhes do pirata adicionado.</returns>
+    /// <response code="200">Retorna os detalhes do pirata adicionado.</response>
+    /// <response code="400">Retorna se houver um erro ao adicionar o pirata.</response>
     [HttpPost(Name = "AddPirata")]
     [Authorize]
     public async Task<IActionResult> Post([FromForm] PirataDto model)
@@ -85,6 +110,15 @@ public class PirataController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Atualiza os detalhes de um pirata existente.
+    /// Requer autenticação.
+    /// </summary>
+    /// <param name="id">O ID do pirata a ser atualizado.</param>
+    /// <param name="model">Os novos dados do pirata.</param>
+    /// <returns>Os detalhes do pirata atualizado.</returns>
+    /// <response code="200">Retorna os detalhes do pirata atualizado.</response>
+    /// <response code="400">Retorna se houver um erro ao atualizar o pirata.</response>
     [HttpPut("{id}", Name = "UpdatePirata")]
     [Authorize]
     public async Task<IActionResult> Put(int id, PirataDto model)
@@ -102,6 +136,14 @@ public class PirataController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Deleta um pirata do sistema.
+    /// Requer autenticação.
+    /// </summary>
+    /// <param name="id">O ID do pirata a ser deletado.</param>
+    /// <returns>Uma mensagem indicando o sucesso da operação.</returns>
+    /// <response code="200">Retorna se o pirata foi deletado com sucesso.</response>
+    /// <response code="400">Retorna se não foi possível deletar o pirata.</response>
     [HttpDelete("{id}", Name = "DeletePirata")]
     [Authorize]
     public async Task<IActionResult> Delete(int id)
